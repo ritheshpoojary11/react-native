@@ -14,7 +14,9 @@ import AdminHomeScreen from './Admin/AdminHomeScreen';
 import RescuesScreen from './Admin/RescuesScreen';
 import AddRescuerScreen from './Admin/AddRescuerScreen';
 import TaskToCompleteScreen from './Rescuer/TaskToCompleteScreen';
-
+import SupAdminScreen from './Sup_admin/SupAdminScreen';
+import AddAdminScreen from './Sup_admin/AddAdminScreen';
+import ForgotPasswordScreen from './ForgotPasswordScreen';
 type RootStackParamList = {
   ReportAnimalScreen: { mobileNumber: string };
   ReportsScreen: undefined;
@@ -27,7 +29,9 @@ type RootStackParamList = {
   RescuesScreen: undefined;
   AddRescuerScreen: undefined;
   TaskToCompleteScreen: undefined;
-
+  SupAdminScreen: undefined;
+  AddAdminScreen: undefined;
+  ForgotPasswordScreen: undefined;
 };
 
 type CustomHeaderProps = {
@@ -122,7 +126,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ navigation, options }) => {
       <Animated.View style={[styles.menuContainer, { transform: [{ translateX: slideAnim }] }]}>
         <Text style={styles.menuItem} onPress={() => handleMenuItemPress('PublicHomeScreen')}>Home</Text>
         <Text style={styles.menuItem} onPress={() => handleMenuItemPress('ReportAnimalScreen')}>Report a Wildlife</Text>
-        <Text style={styles.menuItem} onPress={() => handleMenuItemPress('ReportsScreen')}>Reports</Text>
+   
       </Animated.View>
 
       {modalVisible && (
@@ -168,6 +172,9 @@ const AppNavigator: React.FC = () => (
       <Stack.Screen name="RescuesScreen" component={RescuesScreen} options={{ headerShown: false }} />
       <Stack.Screen name="AddRescuerScreen" component={AddRescuerScreen} options={{ headerShown: false }} />
       <Stack.Screen name="TaskToCompleteScreen" component={TaskToCompleteScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SupAdminScreen" component={SupAdminScreen} options={{ title: 'Super Admin' }} />
+      <Stack.Screen name="AddAdminScreen" component={AddAdminScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   </NavigationContainer>
 );

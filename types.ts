@@ -8,11 +8,14 @@ export type RootStackParamList = {
   LoginScreen: undefined;
   PublicHomeScreen: { mobileNumber: string }; // Add mobileNumber parameter here if needed
   RescuerHomeScreen: { mobileNumber: string }; // Add mobileNumber parameter here if needed
-  AdminHomeScreen: undefined;
+  AdminHomeScreen: { mobileNumber: string };
   DosAndDontsScreen: undefined;
   RescuesScreen: undefined;
-  AddRescuerScreen: undefined;
+  AddRescuerScreen: { adminMobileNumber: string };
   UnassignedScreen: undefined;
   PendingRescuesScreen: undefined;
   TaskToCompleteScreen: undefined;
+  AddAdminScreen: undefined;
+  SupAdminScreen: undefined;
+  ForgotPasswordScreen: undefined;
 };

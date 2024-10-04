@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Card } from 'react-native-paper';
-
+import { RouteProp, useRoute } from '@react-navigation/native'; 
+import { Alert } from 'react-native';
 const imageMap: { [key: string]: any } = {
   'anumal_attack.png': require('../assets/rescues.png'),
   'reports.png': require('../assets/report.png'),
@@ -31,15 +32,23 @@ type NavigationProp = {
   navigate: (screen: string) => void;
 };
 
-type NextScreenProps = {
-  navigation: NavigationProp;
+type RouteParams = {
+  mobileNumber?: string; // Define mobileNumber as optional
 };
 
-const AdminHomeScreen: React.FC<NextScreenProps> = ({ navigation }) => {
+type AdminHomeScreenRouteProp = RouteProp<{ AdminHomeScreen: RouteParams }, 'AdminHomeScreen'>;
+
+type NextScreenProps = {
+  navigation: NavigationProp;
+  route: AdminHomeScreenRouteProp; // Add route prop
+};
+
+const AdminHomeScreen: React.FC<NextScreenProps> = ({navigation, route }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<CarouselData> | null>(null);
   const [activePage, setActivePage] = useState('home'); // Track active page
-
+  const [mobileNumber, setMobileNumber] = useState<string | undefined>(route.params.mobileNumber);
+  
   const cardsData: CardData[] = [
     { id: '1', title: 'Add Rescuer', subtitle: 'Subtitle 1', image: 'pawprint.png' },
     { id: '2', title: 'Rescues', subtitle: 'Subtitle 2', image: 'anumal_attack.png' },
@@ -81,10 +90,11 @@ const AdminHomeScreen: React.FC<NextScreenProps> = ({ navigation }) => {
     });
   };
 
-  const handleNavigation = (page: string) => {
+  const handleNavigation = (page: string, params?: { mobileNumber?: string }) => {
     setActivePage(page);
-    navigation.navigate(page);
-  };
+    navigation.navigate(page, params); // Pass the params directly
+};
+
 
   return (
     <View style={styles.container}>
@@ -111,7 +121,7 @@ const AdminHomeScreen: React.FC<NextScreenProps> = ({ navigation }) => {
                   handleNavigation('ReportsScreen');
                 }
                 else if (item.title === 'Add Rescuer') {
-                    handleNavigation('AddRescuerScreen');
+                    handleNavigation('AddRescuerScreen', { adminMobileNumber: mobileNumber });
                   }
               }}>
               <Card style={styles.card}>

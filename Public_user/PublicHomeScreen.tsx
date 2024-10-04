@@ -9,10 +9,10 @@ const imageMap: { [key: string]: any } = {
   'reports.png': require('../assets/image.png'),
   'pawprint.png': require('../assets/elephant1.png'),
   'quickaccess.png': require('../assets/access.png'),
-  'carousel1.png': require('../assets/aa.png'),
-  'carousel2.png': require('../assets/img2.jpg'),
-  'carousel3.png': require('../assets/img3.jpg'),
-  'carousel4.png': require('../assets/img 4.jpg'),
+  'carousel1.png': require('../assets/guar_attack.png'),
+  'carousel2.png': require('../assets/snake_attack.png'),
+  'carousel3.png': require('../assets/deer_attack.png'),
+  
 };
 
 type CardData = {
@@ -22,9 +22,8 @@ type CardData = {
   image: keyof typeof imageMap;
 };
 
-type CarouselData = {
+type ImageCardData = {
   id: string;
-  title: string;
   image: keyof typeof imageMap;
 };
 
@@ -44,8 +43,6 @@ type NextScreenProps = {
 };
 
 const PublicHomeScreen: React.FC<NextScreenProps> = ({ navigation, route }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList<CarouselData> | null>(null);
   const [activePage, setActivePage] = useState('home'); // Track active page
   const [mobileNumber, setMobileNumber] = useState<string | undefined>(route.params.mobileNumber);
 
@@ -54,39 +51,12 @@ const PublicHomeScreen: React.FC<NextScreenProps> = ({ navigation, route }) => {
     { id: '2', title: "Dos & Don'ts", subtitle: 'Subtitle 2', image: 'anumal_attack.png' },
   ];
 
-  const carouselData: CarouselData[] = [
-    { id: '1', title: 'Item 1', image: 'carousel1.png' },
-    { id: '2', title: 'Item 2', image: 'carousel2.png' },
-    { id: '3', title: 'Item 3', image: 'carousel3.png' },
-    { id: '4', title: 'Item 4', image: 'carousel4.png' },
+  const imageCardsData: ImageCardData[] = [
+    { id: '1', image: 'carousel1.png' },
+    { id: '2', image: 'carousel2.png' },
+    { id: '3', image: 'carousel3.png' },
+    
   ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % carouselData.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToIndex({ animated: true, index: currentIndex });
-    }
-  }, [currentIndex]);
-
-  const getItemLayout = (data: CarouselData[] | null | undefined, index: number) => ({
-    length: 140,
-    offset: 140 * index,
-    index,
-  });
-
-  const onScrollToIndexFailed = (info: { index: number }) => {
-    const wait = new Promise((resolve) => setTimeout(resolve, 500));
-    wait.then(() => {
-      flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
-    });
-  };
 
   const handleNavigation = (page: string) => {
     setActivePage(page);
@@ -133,39 +103,30 @@ const PublicHomeScreen: React.FC<NextScreenProps> = ({ navigation, route }) => {
           contentContainerStyle={styles.cardList}
         />
 
-        <View style={styles.carouselContainer}>
-          <View style={styles.carouselTextContainer}>
-            <Text style={styles.cText}>Our rescues......</Text>
-          </View>
+        {/* New Image-only sliding cards */}
+        <View>
           <FlatList
-            ref={flatListRef}
-            data={carouselData}
+            data={imageCardsData}
             renderItem={({ item }) => (
-              <View style={styles.carouselItemOuterContainer}>
-                <Card style={styles.card}>
-                  <Card.Content style={styles.carouselItem}>
-                    <Image source={imageMap[item.image]} style={styles.carouselImage} />
-                    <Text style={styles.carouselItemText}>{item.title}</Text>
+              <TouchableOpacity style={styles.imageCardOuterContainer}>
+                <Card style={styles.imageCard}>
+                  <Card.Content style={styles.imageCardContent}>
+                    <Image source={imageMap[item.image]} style={styles.imageCardImage} />
                   </Card.Content>
                 </Card>
-              </View>
+              </TouchableOpacity>
             )}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.carouselList}
-            pagingEnabled
-            getItemLayout={getItemLayout}
-            onScrollToIndexFailed={onScrollToIndexFailed}
+            contentContainerStyle={styles.imageCardList}
           />
-          <View style={styles.carouselDotsContainer}>
-            <Icon name="more-horiz" size={30} color="#FFFFFF" />
-          </View>
         </View>
       </ScrollView>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -182,7 +143,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     zIndex: 0,
-  
   },
   slogan: {
     textAlign: 'center',
@@ -239,7 +199,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     maxWidth: 118, // Adjust based on card width
-  
   },
   card: {
     borderRadius: 10,
@@ -266,68 +225,43 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'CustomFont', // Use custom font here
   },
-  carouselContainer: {
+  imageCardContainer: {
     marginTop: 20,
-    alignItems: 'center',
-    position: 'relative',
-    zIndex: 2,
   },
-  carouselTextContainer: {
-    marginBottom: 10,
-  },
-  cText: {
-    fontSize: 15,
-    fontFamily: 'CustomFont', // Use custom font here
-    
-  },
-  carouselList: {
-    alignItems: 'center',
-  },
-  carouselItemOuterContainer: {
-    width: 180, // Width of the outer container
+  imageCardOuterContainer: {
+    flex: 1,
     marginHorizontal: 10,
+    backgroundColor: '#FFFFFF', // Set card background to white
+    borderRadius: 10,
+    overflow: 'hidden',
+    height: 320,
+    width: 280,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  carouselItem: {
-    justifyContent: 'center',
+  imageCard: {
+    borderRadius: 0,
+    overflow: 'hidden',
+    minWidth: 100,
+  },
+  imageCardContent: {
     alignItems: 'center',
-    height: 220, // Height of the outer container
+    justifyContent: 'center',
+    height: '100%',
   },
-  carouselImage: {
-    width: '100%', // Make image fill the outer container width
-    height: '100%', // Make image fill the outer container height
+  imageCardImage: {
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
   },
-  carouselItemText: {
-    marginTop: 10,
-    fontSize: 18, // Increase font size
-    fontFamily: 'CustomFont', // Use custom font here
-  },
-  carouselDotsContainer: {
-    position: 'absolute',
-    bottom: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  bottomNav: {
+  imageCardList: {
+    flexGrow: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF', // Change background to white
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    zIndex: 10,
+    paddingVertical: 20,
   },
 });
 

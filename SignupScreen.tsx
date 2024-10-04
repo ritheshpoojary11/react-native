@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { database, ref, set } from './firebaseConfig';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types'; // Import your types
-
+import { get, child } from 'firebase/database'; // Import necessary Firebase functions
 // Define the type for navigation prop
 type SignupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'SignupScreen'>;
 
@@ -14,24 +14,55 @@ interface SignupScreenProps {
 
 const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
   const [mobileNumber, setMobileNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSignup = () => {
-    if (!mobileNumber) {
-      Alert.alert("Error", "Please enter your mobile number.");
+    // Validation for mobile number (check if it's 10 digits long)
+    if (!mobileNumber || mobileNumber.length !== 10) {
+      Alert.alert("Error", "Please enter a valid 10-digit mobile number.");
       return;
     }
-
-    // Store user data in Firebase
+  
+    // Validation for empty password
+    if (!password) {
+      Alert.alert("Error", "Please enter a password.");
+      return;
+    }
+  
+    // Validation for password and confirm password matching
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+  
+    // Reference to the user's node in the Firebase database
     const userRef = ref(database, `public_users/${mobileNumber}`);
-    set(userRef, {
-      mobileNumber,
-    })
-      .then(() => {
-        Alert.alert("Success", "Signup successful!");
-        navigation.navigate('PublicHomeScreen', { mobileNumber }); // Navigate to the public home screen
+  
+    // Check if the mobile number already exists
+    get(child(ref(database), `public_users/${mobileNumber}`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          // Mobile number already exists, show error message
+          Alert.alert("Error", "This mobile number is already registered. Please log in or use a different number.");
+        } else {
+          // Mobile number does not exist, proceed with signup
+          set(userRef, {
+            mobileNumber,
+            password, // Store the password along with mobile number
+          })
+            .then(() => {
+              Alert.alert("Success", "Signup successful!");
+              navigation.navigate('PublicHomeScreen', { mobileNumber }); // Navigate to the public home screen
+            })
+            .catch((error) => {
+              Alert.alert("Error", error.message);
+            });
+        }
       })
       .catch((error) => {
-        Alert.alert("Error", error.message);
+        Alert.alert("Error", "Failed to check the mobile number. Please try again later.");
+        console.error(error);
       });
   };
 
@@ -52,6 +83,30 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
           keyboardType="phone-pad"
           value={mobileNumber}
           onChangeText={setMobileNumber}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon name="lock" size={20} color="#004D40" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter password"
+          placeholderTextColor="#CCCCCC"
+          secureTextEntry={true}
+          value={password}
+          onChangeText={setPassword}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Icon name="lock" size={20} color="#004D40" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm password"
+          placeholderTextColor="#CCCCCC"
+          secureTextEntry={true}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
         />
       </View>
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View,
+import {
+  View,
   Text,
   TextInput,
   Alert,
@@ -8,21 +9,14 @@ import { View,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
-  Keyboard } from 'react-native';
+  Keyboard,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { database, ref, onValue } from './firebaseConfig';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from './types';
 
 // Define the type for the navigation prop
-type RootStackParamList = {
-  SignupScreen: undefined;
-  PublicHomeScreen: { mobileNumber: string };
-  RescuerHomeScreen: { mobileNumber: string };
-  AdminHomeScreen: { mobileNumber: string };
-  // Add other screens as needed
-};
-
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignupScreen'>;
 
 type Props = {
@@ -31,22 +25,42 @@ type Props = {
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [mobileNumber, setMobileNumber] = useState('');
+  const [password, setPassword] = useState('');
 
+  // Function to check the user table for both mobile number and password
   const checkUserTable = (table: string, callback: (exists: boolean, role?: string) => void) => {
     const userRef = ref(database, `${table}/${mobileNumber}`);
     onValue(userRef, (snapshot) => {
       const userData = snapshot.val();
-      if (userData) {
-        callback(true, table); // User exists, pass table name as role
+      if (userData && userData.password === password) {
+        callback(true, table); // User exists and password matches
       } else {
         callback(false);
       }
     });
   };
 
+  // Validate mobile number format
+  const isValidMobileNumber = (number: string) => {
+    const mobileRegex = /^[0-9]{10}$/; // Regular expression for 10 digits
+    return mobileRegex.test(number);
+  };
+
   const handleLogin = () => {
-    if (!mobileNumber) {
-      Alert.alert('Error', 'Please enter your mobile number.');
+    if (!mobileNumber || !password) {
+      Alert.alert('Error', 'Please enter both mobile number and password.');
+      return;
+    }
+
+    // Validate the mobile number format
+    if (!isValidMobileNumber(mobileNumber)) {
+      Alert.alert('Error', 'Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    // Check if the mobile number is the special number for Super Admin
+    if (mobileNumber === '9876543210' && password === 'superadminpassword') {
+      navigation.navigate('SupAdminScreen');
       return;
     }
 
@@ -63,7 +77,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               if (exists) {
                 navigation.navigate('AdminHomeScreen', { mobileNumber });
               } else {
-                Alert.alert('Error', 'Mobile number not found. Please sign up.');
+                Alert.alert('Error', 'Mobile number or password is incorrect. Please try again.');
               }
             });
           }
@@ -91,8 +105,25 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               keyboardType="phone-pad"
               value={mobileNumber}
               onChangeText={setMobileNumber}
+              maxLength={10} // Limiting to 10 characters
             />
           </View>
+
+          <View style={styles.inputContainer}>
+            <Icon name="lock" size={20} color="#004D40" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter password"
+              placeholderTextColor="#CCCCCC"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+            <Text style={styles.signupText}>Forgot password</Text>
+          </TouchableOpacity>
+          </View>
+          
 
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.buttonText}>Login</Text>

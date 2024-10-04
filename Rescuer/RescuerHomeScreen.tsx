@@ -156,7 +156,6 @@ const RescuerHomeScreen: React.FC<NextScreenProps> = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
-
       
     </View>
   );

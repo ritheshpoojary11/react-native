@@ -27,23 +27,25 @@ const DosAndDontsScreen: React.FC<DosAndDontsScreenProps> = ({ navigation }) => 
       </TouchableOpacity>
 
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Dos and Don'ts</Text>
+        <Text style={styles.headerText}>Dos and Don'ts of Snakebites</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Dos</Text>
-          <Text style={styles.sectionText}>• Do ensure you report any wildlife sightings immediately.</Text>
-          <Text style={styles.sectionText}>• Do provide accurate location details when reporting.</Text>
-          <Text style={styles.sectionText}>• Do keep calm and stay safe when encountering wildlife.</Text>
+          <Text style={styles.sectionText}>• Stay calm and still: Movement can increase the spread of venom, so minimize movement as much as possible.</Text>
+          <Text style={styles.sectionText}>• Remove any tight clothing, jewelry, or accessories: Swelling may occur around the bite, so removing anything tight around the bite area helps prevent further complications.</Text>
+          <Text style={styles.sectionText}>• Keep the affected limb at or slightly below heart level: This helps slow the spread of venom through the bloodstream.</Text>
+          <Text style={styles.sectionText}>• Seek medical attention immediately: Transport the victim to a medical facility as quickly as possible, ensuring minimal movement of the bite area.</Text>
+         
           {/* Add more items as needed */}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Don'ts</Text>
-          <Text style={styles.sectionText}>• Don’t approach or attempt to capture wildlife.</Text>
-          <Text style={styles.sectionText}>• Don’t share your personal information unnecessarily.</Text>
-          <Text style={styles.sectionText}>• Don’t ignore safety guidelines when in the vicinity of wildlife.</Text>
+          <Text style={styles.sectionText}>• Do not apply tight tourniquets: Tight tourniquets can cause more harm than good by restricting blood flow and leading to severe tissue damage​.</Text>
+          <Text style={styles.sectionText}>• Do not cut the wound or attempt to suck out the venom: These methods are ineffective and can cause further injury or infection​.</Text>
+          <Text style={styles.sectionText}>• Avoid using cold packs, herbal remedies, or other traditional methods: These can be harmful and delay proper treatment.</Text>
           {/* Add more items as needed */}
         </View>
       </ScrollView>
