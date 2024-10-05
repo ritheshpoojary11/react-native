@@ -67,7 +67,7 @@ const PublicHomeScreen: React.FC<NextScreenProps> = ({ navigation, route }) => {
     <View style={styles.container}>
       <View style={styles.backgroundContainer} />
 
-      <Text style={styles.slogan}>Saving Lives, One Paw at a Time</Text>
+      <Text style={styles.slogan}>Protecting Wildlife, Preserving Nature.</Text>
 
       <View style={styles.searchBar}>
         <Icon name="search" size={20} color="#999999" style={styles.searchIcon} />

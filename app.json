@@ -15,11 +15,20 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.ritheshpoojary.mynativewind",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ritheshpoojary.mynativewind"
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "INTERNET",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "minSdkVersion": 21,  
+      "targetSdkVersion": 33 
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -28,6 +37,10 @@
       "eas": {
         "projectId": "c2474765-d6a7-41ce-88c3-680359ae8694"
       }
+    },
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0
     }
   }
 }

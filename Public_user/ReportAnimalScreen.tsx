@@ -96,12 +96,13 @@ const ReportAnimalScreen: React.FC<ReportAnimalScreenProps> = ({ navigation, rou
         setAlertVisible(true);
         return;
       }
-
+c
       let location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
-
+      console.log('aa');
       const locationMessage = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
+      console.log('aa',locationMessage);
       setAlertTitle('Location Accessed');
       setLocation(locationMessage);
       setAlertMessage(locationMessage);
