@@ -1,21 +1,9 @@
 import React from 'react';
 import { Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types';
 
-
-type DosAndDontsScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'DosAndDontsScreen'
->;
-
-interface DosAndDontsScreenProps {
-  navigation: DosAndDontsScreenNavigationProp;
-}
-
-const DosAndDontsScreen: React.FC<DosAndDontsScreenProps> = ({ navigation }) => {
-
+const DosAndDontsScreen = ({ navigation }) => {
+  
   const handleGoBack = () => {
     navigation.goBack(); // Navigate back to the previous screen
   };
@@ -37,7 +25,6 @@ const DosAndDontsScreen: React.FC<DosAndDontsScreenProps> = ({ navigation }) => 
           <Text style={styles.sectionText}>• Remove any tight clothing, jewelry, or accessories: Swelling may occur around the bite, so removing anything tight around the bite area helps prevent further complications.</Text>
           <Text style={styles.sectionText}>• Keep the affected limb at or slightly below heart level: This helps slow the spread of venom through the bloodstream.</Text>
           <Text style={styles.sectionText}>• Seek medical attention immediately: Transport the victim to a medical facility as quickly as possible, ensuring minimal movement of the bite area.</Text>
-         
           {/* Add more items as needed */}
         </View>
 

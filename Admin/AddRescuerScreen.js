@@ -9,34 +9,27 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types';
 import { database, ref, set, serverTimestamp } from '../firebaseConfig';
 
-interface AddRescuerScreenProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'AddRescuerScreen'>;
-  route: { params: { adminMobileNumber: string } }; // Receive admin mobile number
-}
-
-
-const AddRescuerScreen: React.FC<AddRescuerScreenProps> = ({ navigation, route }) => {
+const AddRescuerScreen = ({ navigation, route }) => {
   const { adminMobileNumber } = route.params; // Extract admin mobile number
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [mobileNumber, setMobileNumber] = useState<string>('');
-  const [gender, setGender] = useState<string>(''); // For tracking the selected gender
-  const [pincode, setPincode] = useState<string>(''); // New field for pincode
-  const [address, setAddress] = useState<string>(''); // For the auto-filled address
-  const [latitude, setLatitude] = useState<number | null>(null); // Latitude
-  const [longitude, setLongitude] = useState<number | null>(null); // Longitude
-  const [loading, setLoading] = useState<boolean>(false);
-if (!adminMobileNumber) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [gender, setGender] = useState(''); // For tracking the selected gender
+  const [pincode, setPincode] = useState(''); // New field for pincode
+  const [address, setAddress] = useState(''); // For the auto-filled address
+  const [latitude, setLatitude] = useState(null); // Latitude
+  const [longitude, setLongitude] = useState(null); // Longitude
+  const [loading, setLoading] = useState(false);
+
+  if (!adminMobileNumber) {
     Alert.alert('Error', 'Admin mobile number is undefined.');
     return;
-}
+  }
 
   // Function to generate a random password
-  const generatePassword = (): string => {
+  const generatePassword = () => {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let password = '';
     for (let i = 0; i < 8; i++) {
@@ -47,7 +40,7 @@ if (!adminMobileNumber) {
   };
 
   // Function to fetch location based on pincode
-  const fetchLocationByPincode = async (pincode: string) => {
+  const fetchLocationByPincode = async (pincode) => {
     try {
       const geocode = await Location.geocodeAsync(pincode);
       if (geocode.length > 0) {
@@ -130,7 +123,7 @@ if (!adminMobileNumber) {
   };
 
   // When user inputs the pincode, auto-fetch the address
-  const handlePincodeChange = async (enteredPincode: string) => {
+  const handlePincodeChange = async (enteredPincode) => {
     setPincode(enteredPincode);
     if (enteredPincode.length === 6) {
       await fetchLocationByPincode(enteredPincode); // Fetch location when pincode is 6 digits
@@ -282,6 +275,7 @@ const styles = StyleSheet.create({
   },
   radioText: {
     marginLeft: 5,
+    fontSize: 16,
   },
   submitButton: {
     backgroundColor: '#004D40',
@@ -292,5 +286,6 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: '#fff',
     fontSize: 18,
+    fontWeight: 'bold',
   },
 });

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { database, ref, set } from './firebaseConfig'; // Import your Firebase config
 
-const ForgotPasswordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const ForgotPasswordScreen = ({ navigation }) => {
   const [mobileNumber, setMobileNumber] = useState('');
 
   const handleResetPassword = () => {

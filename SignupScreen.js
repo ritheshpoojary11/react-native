@@ -1,81 +1,69 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { database, ref, set } from './firebaseConfig';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from './types'; // Import your types
+import { useNavigation } from '@react-navigation/native';
 import { get, child } from 'firebase/database'; // Import necessary Firebase functions
-// Define the type for navigation prop
-type SignupScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'SignupScreen'>;
 
-interface SignupScreenProps {
-  navigation: SignupScreenNavigationProp;
-}
+const { width, height } = Dimensions.get('window'); // Get device's width and height
 
-const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
+const SignupScreen = () => {
+  const navigation = useNavigation();
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSignup = () => {
-    // Validation for mobile number (check if it's 10 digits long)
     if (!mobileNumber || mobileNumber.length !== 10) {
-      Alert.alert("Error", "Please enter a valid 10-digit mobile number.");
+      Alert.alert('Error', 'Please enter a valid 10-digit mobile number.');
       return;
     }
-  
-    // Validation for empty password
+
     if (!password) {
-      Alert.alert("Error", "Please enter a password.");
+      Alert.alert('Error', 'Please enter a password.');
       return;
     }
-  
-    // Validation for password and confirm password matching
+
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
+      Alert.alert('Error', 'Passwords do not match.');
       return;
     }
-  
-    // Reference to the user's node in the Firebase database
+
     const userRef = ref(database, `public_users/${mobileNumber}`);
-  
-    // Check if the mobile number already exists
+
     get(child(ref(database), `public_users/${mobileNumber}`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          // Mobile number already exists, show error message
-          Alert.alert("Error", "This mobile number is already registered. Please log in or use a different number.");
+          Alert.alert('Error', 'This mobile number is already registered. Please log in or use a different number.');
         } else {
-          // Mobile number does not exist, proceed with signup
           set(userRef, {
             mobileNumber,
-            password, // Store the password along with mobile number
+            password,
           })
             .then(() => {
-              Alert.alert("Success", "Signup successful!");
-              navigation.navigate('PublicHomeScreen', { mobileNumber }); // Navigate to the public home screen
+              Alert.alert('Success', 'Signup successful!');
+              navigation.navigate('PublicHomeScreen', { mobileNumber });
             })
             .catch((error) => {
-              Alert.alert("Error", error.message);
+              Alert.alert('Error', error.message);
             });
         }
       })
       .catch((error) => {
-        Alert.alert("Error", "Failed to check the mobile number. Please try again later.");
+        Alert.alert('Error', 'Failed to check the mobile number. Please try again later.');
         console.error(error);
       });
   };
 
   return (
     <View style={styles.container}>
-      {/* Title at the top */}
       <Text style={styles.topTitle}>Sign Up</Text>
 
       <View style={styles.backgroundContainer} />
       <Text style={styles.title}>Create an Account</Text>
 
       <View style={styles.inputContainer}>
-        <Icon name="phone" size={20} color="#004D40" style={styles.icon} />
+        <Icon name="phone" size={width * 0.05} color="#004D40" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Enter mobile number"
@@ -87,7 +75,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="lock" size={20} color="#004D40" style={styles.icon} />
+        <Icon name="lock" size={width * 0.05} color="#004D40" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Enter password"
@@ -99,7 +87,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name="lock" size={20} color="#004D40" style={styles.icon} />
+        <Icon name="lock" size={width * 0.05} color="#004D40" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Confirm password"
@@ -114,7 +102,6 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
-      {/* Add a login link */}
       <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
         <Text style={styles.loginText}>Already have an account? Log in</Text>
       </TouchableOpacity>
@@ -126,43 +113,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: width * 0.05, // 5% of screen width
     backgroundColor: '#004D40',
   },
   topTitle: {
-    fontSize: 28,
+    fontSize: width * 0.07, // Dynamic font size based on screen width
     color: '#FFFFFF',
     textAlign: 'center',
-    marginTop: -100,
+    marginTop: height * -0.1, // Negative margin for adjusting title position
     fontFamily: 'CustomFont',
-    paddingBottom: 0,
-    marginBottom: 50,
+    marginBottom: height * 0.05,
   },
   backgroundContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     width: '111%',
-    height: '70%',
+    height: height * 0.7, // 70% of screen height
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: width * 0.06, // Dynamic font size based on screen width
     color: '#004D40',
-    marginBottom: 50,
+    marginBottom: height * 0.05,
     textAlign: 'center',
     fontFamily: 'CustomFont',
-    paddingTop: 20,
+    paddingTop: height * 0.02,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 25,
-    paddingHorizontal: 15,
-    marginBottom: 20,
+    paddingHorizontal: width * 0.04, // 4% horizontal padding
+    marginBottom: height * 0.02, // 2% margin bottom
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -174,25 +160,25 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 45,
+    height: height * 0.06, // 6% of screen height
     color: '#000',
     fontFamily: 'CustomFont',
   },
   signupButton: {
     backgroundColor: '#004D40',
-    paddingVertical: 15,
+    paddingVertical: height * 0.02, // 2% of screen height for padding
     borderRadius: 25,
     alignItems: 'center',
     elevation: 3,
-    marginTop: 10,
+    marginTop: height * 0.02, // 2% margin top
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: width * 0.045, // 4.5% of screen width
     fontFamily: 'CustomFont',
   },
   loginText: {
-    marginTop: 20,
+    marginTop: height * 0.02,
     color: '#0066cc',
     textAlign: 'center',
     textDecorationLine: 'underline',

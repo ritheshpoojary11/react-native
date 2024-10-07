@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Card } from 'react-native-paper';
 
-const imageMap: { [key: string]: any } = {
+const { width, height } = Dimensions.get('window');
+
+const imageMap = {
   'anumal_attack.png': require('../assets/hmw.png'),
   'image.png': require('../assets/image.png'),
   'pawprint.png': require('../assets/pawprint.png'),
@@ -14,39 +16,16 @@ const imageMap: { [key: string]: any } = {
   'carousel4.png': require('../assets/img 4.jpg'),
 };
 
-type CardData = {
-  id: string;
-  title: string;
-  subtitle: string;
-  image: keyof typeof imageMap;
-};
-
-type CarouselData = {
-  id: string;
-  title: string;
-  image: keyof typeof imageMap;
-};
-
-type NavigationProp = {
-  navigate: (screen: string) => void;
-};
-
-type NextScreenProps = {
-  navigation: NavigationProp;
-};
-
-const RescuerHomeScreen: React.FC<NextScreenProps> = ({ navigation }) => {
+const RescuerHomeScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList<CarouselData> | null>(null);
+  const flatListRef = useRef(null);
   const [activePage, setActivePage] = useState('home'); // Track active page
 
-  const cardsData: CardData[] = [
-   
+  const cardsData = [
     { id: '3', title: 'Task to Complete', subtitle: 'Subtitle 3', image: 'image.png' },
-    
   ];
 
-  const carouselData: CarouselData[] = [
+  const carouselData = [
     { id: '1', title: 'Item 1', image: 'carousel1.png' },
     { id: '2', title: 'Item 2', image: 'carousel2.png' },
     { id: '3', title: 'Item 3', image: 'carousel3.png' },
@@ -67,20 +46,20 @@ const RescuerHomeScreen: React.FC<NextScreenProps> = ({ navigation }) => {
     }
   }, [currentIndex]);
 
-  const getItemLayout = (data: CarouselData[] | null | undefined, index: number) => ({
+  const getItemLayout = (data, index) => ({
     length: 140,
     offset: 140 * index,
     index,
   });
 
-  const onScrollToIndexFailed = (info: { index: number }) => {
+  const onScrollToIndexFailed = (info) => {
     const wait = new Promise((resolve) => setTimeout(resolve, 500));
     wait.then(() => {
       flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
     });
   };
 
-  const handleNavigation = (page: string) => {
+  const handleNavigation = (page) => {
     setActivePage(page);
     navigation.navigate(page);
   };
@@ -156,7 +135,6 @@ const RescuerHomeScreen: React.FC<NextScreenProps> = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
-      
     </View>
   );
 };
@@ -172,74 +150,70 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     width: '100%',
-    height: '70%',
+    height: height * 0.7, // Make background responsive
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     zIndex: 0,
-  
   },
   slogan: {
     textAlign: 'center',
     color: '#FFFFFF',
-    fontSize: 20,
-    marginTop: 40,
-    fontFamily: 'CustomFont', // Use custom font here
+    fontSize: width * 0.05, // Responsive font size
+    marginTop: height * 0.05,
+    fontFamily: 'CustomFont',
   },
   scrollViewContent: {
-    paddingBottom: 70,
+    paddingBottom: height * 0.1,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 15,
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(100, 121, 107, 0.3)', // Transparent green background with blur
+    marginTop: height * 0.02,
+    paddingHorizontal: width * 0.05,
+    backgroundColor: 'rgba(100, 121, 107, 0.3)',
     borderRadius: 25,
-    marginHorizontal: 20,
+    marginHorizontal: width * 0.05,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 4,
     zIndex: 2,
-    fontFamily: 'CustomFont',
   },
   searchIcon: {
-    marginLeft: 10,
+    marginLeft: width * 0.02,
   },
   searchInput: {
     flex: 1,
-    height: 40,
+    height: height * 0.05,
     paddingHorizontal: 10,
-    color: '#FFFFFF', // Text color for search input
-    fontFamily: 'CustomFont',
+    color: '#FFFFFF',
   },
   cardList: {
     flexGrow: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 20,
+    paddingVertical: height * 0.03,
   },
   cardOuterContainer: {
     flex: 1,
-    marginHorizontal: 10,
-    backgroundColor: '#FFFFFF', // Set card background to white
+    marginHorizontal: width * 0.03,
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     overflow: 'hidden',
-    height: 120,
+    height: height * 0.15, // Responsive height for card
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    maxWidth: 118, // Adjust based on card width
-  
+    maxWidth: width * 0.3, // Responsive width for card
   },
   card: {
     borderRadius: 10,
     overflow: 'hidden',
-    minWidth: 100,
+    minWidth: width * 0.25, // Responsive width for card
   },
   cardContent: {
     alignItems: 'center',
@@ -247,82 +221,63 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   cardImage: {
-    width: 50,
-    height: 50,
+    width: width * 0.15, // Responsive image size
+    height: width * 0.15,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: height * 0.01,
   },
   textContainer: {
     alignItems: 'center',
     padding: 0,
   },
   iconText: {
-    fontSize: 10,
+    fontSize: width * 0.03, // Responsive font size
     textAlign: 'center',
-    fontFamily: 'CustomFont', // Use custom font here
+    fontFamily: 'CustomFont',
   },
   carouselContainer: {
-    marginTop: 20,
+    marginTop: height * 0.03,
     alignItems: 'center',
     position: 'relative',
     zIndex: 2,
   },
   carouselTextContainer: {
-    marginBottom: 10,
+    marginBottom: height * 0.01,
   },
   cText: {
-    fontSize: 15,
-    fontFamily: 'CustomFont', // Use custom font here
-    
+    fontSize: width * 0.04, // Responsive font size
+    fontFamily: 'CustomFont',
   },
   carouselList: {
     alignItems: 'center',
   },
   carouselItemOuterContainer: {
-    width: 180, // Width of the outer container
-    marginHorizontal: 10,
+    width: width * 0.45, // Responsive width for carousel item
+    marginHorizontal: width * 0.03,
   },
   carouselItem: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: 220, // Height of the outer container
+    height: height * 0.28, // Responsive height for carousel item
   },
   carouselImage: {
-    width: '100%', // Make image fill the outer container width
-    height: '100%', // Make image fill the outer container height
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
   },
   carouselItemText: {
-    marginTop: 10,
-    fontSize: 18, // Increase font size
-    fontFamily: 'CustomFont', // Use custom font here
+    marginTop: height * 0.01,
+    fontSize: width * 0.045, // Responsive font size
+    fontFamily: 'CustomFont',
   },
   carouselDotsContainer: {
     position: 'absolute',
-    bottom: 10,
+    bottom: height * 0.02,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF', // Change background to white
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    zIndex: 10,
+    zIndex: 2,
   },
 });
 

@@ -1,36 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Card } from 'react-native-paper';
-import { useState } from 'react';
 
-const imageMap: { [key: string]: any } = {
+const imageMap = {
   'addadmin.png': require('../assets/access.png'), // Replace with actual image for adding admin
 };
 
-type CardData = {
-  id: string;
-  title: string;
-  subtitle: string;
-  image: keyof typeof imageMap;
-};
-
-type NavigationProp = {
-  navigate: (screen: string) => void;
-};
-
-type SupAdminScreenProps = {
-  navigation: NavigationProp;
-};
-
-const SupAdminScreen: React.FC<SupAdminScreenProps> = ({ navigation }) => {
+const SupAdminScreen = ({ navigation }) => {
   const [activePage, setActivePage] = useState('supadmin'); // Track active page
 
-  const cardsData: CardData[] = [
+  const cardsData = [
     { id: '1', title: 'Add Admin', subtitle: 'Add a new admin user', image: 'addadmin.png' },
   ];
 
-  const handleNavigation = (page: string) => {
+  const handleNavigation = (page) => {
     setActivePage(page);
     navigation.navigate(page);
   };
@@ -116,7 +100,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
     zIndex: 2,
-    fontFamily: 'CustomFont',
   },
   searchIcon: {
     marginLeft: 10,

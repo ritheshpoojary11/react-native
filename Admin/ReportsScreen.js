@@ -7,15 +7,15 @@ import { Picker } from '@react-native-picker/picker';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { database, ref, onValue } from '../firebaseConfig';
 
-const ReportsScreen: React.FC = () => {
-  const [data, setData] = useState<any[]>([]);
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+const ReportsScreen = () => {
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [filterVisible, setFilterVisible] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState<string>('All');
+  const [selectedMonth, setSelectedMonth] = useState('All');
   const [downloadHistoryVisible, setDownloadHistoryVisible] = useState(false);
-  const [downloadedFiles, setDownloadedFiles] = useState<string[]>([]);
+  const [downloadedFiles, setDownloadedFiles] = useState([]);
 
   // Fetch data from Firebase
   useEffect(() => {
@@ -80,7 +80,7 @@ const ReportsScreen: React.FC = () => {
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-      const { fileUri } = response.notification.request.content.data as { fileUri: string };
+      const { fileUri } = response.notification.request.content.data;
       if (fileUri) {
         openFile(fileUri);
       }
@@ -89,7 +89,7 @@ const ReportsScreen: React.FC = () => {
     return () => subscription.remove();
   }, []);
 
-  const openFile = async (fileUri: string) => {
+  const openFile = async (fileUri) => {
     try {
       if (Platform.OS === 'android') {
         const contentUri = await FileSystem.getContentUriAsync(fileUri);
@@ -216,13 +216,15 @@ const ReportsScreen: React.FC = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Download History</Text>
-            {downloadedFiles.map((fileUri, index) => (
-              <TouchableOpacity key={index} onPress={() => openFile(fileUri)}>
-                <Text style={styles.downloadHistoryItem}>Report {index + 1}</Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity style={styles.modalButton} onPress={() => setDownloadHistoryVisible(false)}>
-              <Text style={styles.modalButtonText}>Close</Text>
+            <ScrollView>
+              {downloadedFiles.map((file, index) => (
+                <TouchableOpacity key={index} onPress={() => openFile(file)}>
+                  <Text style={styles.downloadedFileText}>{file}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity style={styles.modalCloseButton} onPress={() => setDownloadHistoryVisible(false)}>
+              <Text style={styles.modalCloseButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -234,14 +236,13 @@ const ReportsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
+    padding: 20,
+    backgroundColor: '#f0f0f0',
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
   },
   title: {
     fontSize: 24,
@@ -251,61 +252,68 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   filterButton: {
-    marginLeft: 8,
-    padding: 8,
-    backgroundColor: '#004D40',
-    borderRadius: 4,
+    marginLeft: 10,
   },
   tableContainer: {
-    flexDirection: 'column',
+    marginTop: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#f1f1f1',
-    padding: 8,
+    justifyContent: 'space-between',
+    backgroundColor: '#d9d9d9',
+    padding: 10,
   },
   headerText: {
     fontWeight: 'bold',
-    width: 120, // Adjust as needed for column width
+    flex: 1,
+    textAlign: 'center',
   },
   tableRow: {
     flexDirection: 'row',
-    padding: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    justifyContent: 'space-between',
+    padding: 10,
   },
   rowText: {
-    width: 120, // Adjust as needed for column width
+    flex: 1,
+    textAlign: 'center',
   },
   paginationContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   paginationButton: {
     padding: 10,
-    backgroundColor: '#004D40',
-    borderRadius: 4,
-    marginHorizontal: 8,
-  },
-  paginationText: {
-    color: '#fff',
-    fontSize: 16,
+    backgroundColor: '#007BFF',
+    borderRadius: 5,
   },
   disabledButton: {
-    backgroundColor: '#cccccc',
+    backgroundColor: '#CCCCCC',
+  },
+  paginationText: {
+    color: '#FFFFFF',
   },
   downloadButton: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: '#004D40',
-    borderRadius: 4,
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#28A745',
+    borderRadius: 5,
     alignItems: 'center',
   },
   downloadButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
@@ -314,39 +322,50 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
     backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   picker: {
     height: 50,
     width: '100%',
+    marginBottom: 20,
   },
   modalButtonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
   },
   modalButton: {
     padding: 10,
-    backgroundColor: '#004D40',
-    borderRadius: 4,
-    width: '48%',
+    backgroundColor: '#007BFF',
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
     alignItems: 'center',
   },
   modalButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
-  downloadHistoryItem: {
-    padding: 8,
-    fontSize: 16,
-    color: '#004D40',
+  downloadedFileText: {
+    marginVertical: 5,
+    color: 'blue',
+  },
+  modalCloseButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#DC3545',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    color: '#FFFFFF',
   },
 });
 

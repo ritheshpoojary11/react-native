@@ -11,13 +11,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types';
 import { database, ref, set, serverTimestamp } from '../firebaseConfig';
-
-interface AddAdminScreenProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'AddAdminScreen'>;
-}
 
 // Function to generate random password
 const generatePassword = () => {
@@ -29,16 +23,16 @@ const generatePassword = () => {
   return password;
 };
 
-const AddAdminScreen: React.FC<AddAdminScreenProps> = ({ navigation }) => {
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [mobileNumber, setMobileNumber] = useState<string>('');
-  const [gender, setGender] = useState<string>(''); 
-  const [pincode, setPincode] = useState<string>(''); 
-  const [address, setAddress] = useState<string>(''); 
-  const [latitude, setLatitude] = useState<number | null>(null); 
-  const [longitude, setLongitude] = useState<number | null>(null); 
-  const [loading, setLoading] = useState<boolean>(false);
+const AddAdminScreen = ({ navigation }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [gender, setGender] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [address, setAddress] = useState('');
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleBlur = () => {
     Keyboard.dismiss();
@@ -75,7 +69,7 @@ const AddAdminScreen: React.FC<AddAdminScreenProps> = ({ navigation }) => {
   };
 
   // Mobile number validation function
-  const validateMobileNumber = (number: string) => {
+  const validateMobileNumber = (number) => {
     const mobileRegex = /^[0-9]{10}$/; // Regular expression for a valid 10-digit number
     return mobileRegex.test(number);
   };

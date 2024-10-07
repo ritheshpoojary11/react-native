@@ -1,14 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-interface CustomAlertProps {
-  visible: boolean;
-  title: string;
-  message: string | React.ReactNode;
-  onConfirm: () => void;
-}
-
-const CustomAlertMessage: React.FC<CustomAlertProps> = ({ visible, title, message, onConfirm }) => {
+const CustomAlertMessage = ({ visible, title, message, onConfirm }) => {
   return (
     <Modal
       transparent={true}
@@ -66,6 +59,7 @@ const styles = StyleSheet.create({
     color: '#004d40',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
+    textAlign: 'left',
   },
 });
 

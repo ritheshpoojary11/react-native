@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import ReportAnimalScreen from './Public_user/ReportAnimalScreen';
 import ReportsScreen from './Admin/ReportsScreen';
@@ -17,33 +17,11 @@ import TaskToCompleteScreen from './Rescuer/TaskToCompleteScreen';
 import SupAdminScreen from './Sup_admin/SupAdminScreen';
 import AddAdminScreen from './Sup_admin/AddAdminScreen';
 import ForgotPasswordScreen from './ForgotPasswordScreen';
-type RootStackParamList = {
-  ReportAnimalScreen: { mobileNumber: string };
-  ReportsScreen: undefined;
-  SignupScreen: undefined;
-  LoginScreen: undefined;
-  PublicHomeScreen: { mobileNumber: string };
-  RescuerHomeScreen: { mobileNumber: string };
-  AdminHomeScreen: undefined;
-  DosAndDontsScreen: undefined;
-  RescuesScreen: undefined;
-  AddRescuerScreen: undefined;
-  TaskToCompleteScreen: undefined;
-  SupAdminScreen: undefined;
-  AddAdminScreen: undefined;
-  ForgotPasswordScreen: undefined;
-};
+import SplashScreen from './SplashScreen';
 
-type CustomHeaderProps = {
-  navigation: StackNavigationProp<RootStackParamList, keyof RootStackParamList>;
-  options: {
-    title: string;
-  };
-};
+const Stack = createStackNavigator();
 
-const Stack = createStackNavigator<RootStackParamList>();
-
-const CustomHeader: React.FC<CustomHeaderProps> = ({ navigation, options }) => {
+const CustomHeader = ({ navigation, options }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const slideAnim = useState(new Animated.Value(-200))[0];
@@ -83,8 +61,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ navigation, options }) => {
     }
   };
 
-  // Handle navigation based on the screen and parameters
-  const handleMenuItemPress = (screen: keyof RootStackParamList) => {
+  const handleMenuItemPress = (screen) => {
     toggleMenu();
     switch (screen) {
       case 'ReportAnimalScreen':
@@ -97,7 +74,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ navigation, options }) => {
         navigation.navigate('RescuerHomeScreen', { mobileNumber: '1234567890' });
         break;
       default:
-        navigation.navigate(screen); // For screens without parameters
+        navigation.navigate(screen);
     }
   };
 
@@ -126,7 +103,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ navigation, options }) => {
       <Animated.View style={[styles.menuContainer, { transform: [{ translateX: slideAnim }] }]}>
         <Text style={styles.menuItem} onPress={() => handleMenuItemPress('PublicHomeScreen')}>Home</Text>
         <Text style={styles.menuItem} onPress={() => handleMenuItemPress('ReportAnimalScreen')}>Report a Wildlife</Text>
-   
       </Animated.View>
 
       {modalVisible && (
@@ -138,7 +114,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ navigation, options }) => {
       <Animated.View style={[styles.modalContainer, { transform: [{ translateX: slideRightAnim }] }]}>
         <TouchableOpacity onPress={() => {
           toggleModal();
-
           alert('Logged out');
           handleMenuItemPress('LoginScreen');
         }}>
@@ -149,20 +124,22 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ navigation, options }) => {
   );
 };
 
-const AppNavigator: React.FC = () => (
+const AppNavigator = () => (
   <NavigationContainer>
     <Stack.Navigator
+      initialRouteName="SplashScreen" // Set SplashScreen as the initial screen
       screenOptions={({ navigation, route }) => ({
         header: () => (
           <CustomHeader
-            navigation={navigation as StackNavigationProp<RootStackParamList, keyof RootStackParamList>}
+            navigation={navigation}
             options={{ title: route.name }}
           />
         ),
       })}
     >
-       <Stack.Screen name="SignupScreen" component={SignupScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
       <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SignupScreen" component={SignupScreen} options={{ headerShown: false }} />
       <Stack.Screen name="PublicHomeScreen" component={PublicHomeScreen} options={{ title: 'Public Home' }} />
       <Stack.Screen name="RescuerHomeScreen" component={RescuerHomeScreen} options={{ title: 'Rescuer Home' }} />
       <Stack.Screen name="AdminHomeScreen" component={AdminHomeScreen} options={{ title: 'Admin Home' }} />
@@ -184,17 +161,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    
     paddingTop: 50,
     backgroundColor: '#004D40',
-    
     paddingBottom: 10,
   },
   headerTitle: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
-  
   },
   menuContainer: {
     position: 'absolute',
@@ -205,13 +179,11 @@ const styles = StyleSheet.create({
     padding: 10,
     zIndex: 1,
     borderRadius: 10,
-  
   },
   menuItem: {
     color: '#FFFFFF',
     paddingVertical: 10,
     fontSize: 18,
-  
   },
   overlay: {
     position: 'absolute',
@@ -230,14 +202,12 @@ const styles = StyleSheet.create({
     padding: 10,
     zIndex: 2,
     borderRadius: 10,
-  
   },
   modalItem: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     fontSize: 16,
     color: '#FFFFFF',
-  
   },
 });
 

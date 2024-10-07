@@ -1,18 +1,8 @@
-// firebaseConfig.ts
+// firebaseConfig.js
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set, serverTimestamp, onValue, update } from 'firebase/database';
 
 // Your web app's Firebase configuration
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDTxxBl1DpVTEMA-R4bURsbnHXGvYNV2ho",
-//   authDomain: "mob-app-dd71a.firebaseapp.com",
-//   projectId: "mob-app-dd71a",
-//   storageBucket: "mob-app-dd71a.appspot.com",
-//   messagingSenderId: "901877241301",
-//   appId: "1:901877241301:web:8add3a075794a872e3195c",
-//   measurementId: "G-42V0DDBCF8",
-//   databaseURL: "https://mob-app-dd71a-default-rtdb.firebaseio.com/"
-// };
 const firebaseConfig = {
   apiKey: "AIzaSyBsc_7RSZ-3La_JmRqMjIPeuB46xwxp1-s",
   authDomain: "mobapp-fa519.firebaseapp.com",

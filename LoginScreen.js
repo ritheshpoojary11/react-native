@@ -10,25 +10,18 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { database, ref, onValue } from './firebaseConfig';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from './types';
 
-// Define the type for the navigation prop
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignupScreen'>;
+const { width, height } = Dimensions.get('window'); // Fetch the device's width and height
 
-type Props = {
-  navigation: LoginScreenNavigationProp;
-};
-
-const LoginScreen: React.FC<Props> = ({ navigation }) => {
+const LoginScreen = ({ navigation }) => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
 
-  // Function to check the user table for both mobile number and password
-  const checkUserTable = (table: string, callback: (exists: boolean, role?: string) => void) => {
+  const checkUserTable = (table, callback) => {
     const userRef = ref(database, `${table}/${mobileNumber}`);
     onValue(userRef, (snapshot) => {
       const userData = snapshot.val();
@@ -40,9 +33,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     });
   };
 
-  // Validate mobile number format
-  const isValidMobileNumber = (number: string) => {
-    const mobileRegex = /^[0-9]{10}$/; // Regular expression for 10 digits
+  const isValidMobileNumber = (number) => {
+    const mobileRegex = /^[0-9]{10}$/;
     return mobileRegex.test(number);
   };
 
@@ -52,19 +44,16 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
 
-    // Validate the mobile number format
     if (!isValidMobileNumber(mobileNumber)) {
       Alert.alert('Error', 'Please enter a valid 10-digit mobile number.');
       return;
     }
 
-    // Check if the mobile number is the special number for Super Admin
     if (mobileNumber === '9876543210' && password === 'superadminpassword') {
       navigation.navigate('SupAdminScreen');
       return;
     }
 
-    // Check the public_user table first
     checkUserTable('public_users', (exists, role) => {
       if (exists) {
         navigation.navigate('PublicHomeScreen', { mobileNumber });
@@ -105,7 +94,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               keyboardType="phone-pad"
               value={mobileNumber}
               onChangeText={setMobileNumber}
-              maxLength={10} // Limiting to 10 characters
+              maxLength={10}
             />
           </View>
 
@@ -120,10 +109,9 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               onChangeText={setPassword}
             />
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
-            <Text style={styles.signupText}>Forgot password</Text>
-          </TouchableOpacity>
+              <Text style={styles.signupText}>Forgot password</Text>
+            </TouchableOpacity>
           </View>
-          
 
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.buttonText}>Login</Text>
@@ -146,32 +134,33 @@ const styles = StyleSheet.create({
   inner: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: width * 0.05, // 5% padding horizontally
   },
   backgroundContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     width: '111%',
-    height: '70%',
+    height: height * 0.7, // 70% of screen height
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: width * 0.07, // Dynamic font size based on screen width
     color: '#004D40',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: height * 0.03, // Margin relative to height
     fontFamily: 'CustomFont',
+    paddingTop: height * 0.03,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 25,
-    paddingHorizontal: 15,
-    marginBottom: 20,
+    paddingHorizontal: width * 0.04, // 4% horizontal padding
+    marginBottom: height * 0.02, // 2% margin
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -183,25 +172,25 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 45,
+    height: height * 0.06, // 6% of screen height for input box
     color: '#000',
     fontFamily: 'CustomFont',
   },
   loginButton: {
     backgroundColor: '#004D40',
-    paddingVertical: 15,
+    paddingVertical: height * 0.02, // 2% of height
     borderRadius: 25,
     alignItems: 'center',
     elevation: 3,
-    marginTop: 10,
+    marginTop: height * 0.02,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: width * 0.045, // 4.5% of width
     fontFamily: 'CustomFont',
   },
   signupText: {
-    marginTop: 20,
+    marginTop: height * 0.02,
     color: '#0066cc',
     textAlign: 'center',
     textDecorationLine: 'underline',

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Card } from 'react-native-paper';
-import { RouteProp, useRoute } from '@react-navigation/native'; 
-import { Alert } from 'react-native';
-const imageMap: { [key: string]: any } = {
+import { useRoute } from '@react-navigation/native'; 
+
+const imageMap = {
   'anumal_attack.png': require('../assets/rescues.png'),
   'reports.png': require('../assets/report.png'),
   'pawprint.png': require('../assets/pawprint.png'),
@@ -15,48 +15,20 @@ const imageMap: { [key: string]: any } = {
   'carousel4.png': require('../assets/img 4.jpg'),
 };
 
-type CardData = {
-  id: string;
-  title: string;
-  subtitle: string;
-  image: keyof typeof imageMap;
-};
-
-type CarouselData = {
-  id: string;
-  title: string;
-  image: keyof typeof imageMap;
-};
-
-type NavigationProp = {
-  navigate: (screen: string) => void;
-};
-
-type RouteParams = {
-  mobileNumber?: string; // Define mobileNumber as optional
-};
-
-type AdminHomeScreenRouteProp = RouteProp<{ AdminHomeScreen: RouteParams }, 'AdminHomeScreen'>;
-
-type NextScreenProps = {
-  navigation: NavigationProp;
-  route: AdminHomeScreenRouteProp; // Add route prop
-};
-
-const AdminHomeScreen: React.FC<NextScreenProps> = ({navigation, route }) => {
+const AdminHomeScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList<CarouselData> | null>(null);
+  const flatListRef = useRef(null);
   const [activePage, setActivePage] = useState('home'); // Track active page
-  const [mobileNumber, setMobileNumber] = useState<string | undefined>(route.params.mobileNumber);
-  
-  const cardsData: CardData[] = [
+  const route = useRoute();
+  const [mobileNumber, setMobileNumber] = useState(route.params?.mobileNumber);
+
+  const cardsData = [
     { id: '1', title: 'Add Rescuer', subtitle: 'Subtitle 1', image: 'pawprint.png' },
     { id: '2', title: 'Rescues', subtitle: 'Subtitle 2', image: 'anumal_attack.png' },
     { id: '3', title: 'Reports', subtitle: 'Subtitle 3', image: 'reports.png' },
-    
   ];
 
-  const carouselData: CarouselData[] = [
+  const carouselData = [
     { id: '1', title: 'Item 1', image: 'carousel1.png' },
     { id: '2', title: 'Item 2', image: 'carousel2.png' },
     { id: '3', title: 'Item 3', image: 'carousel3.png' },
@@ -77,24 +49,23 @@ const AdminHomeScreen: React.FC<NextScreenProps> = ({navigation, route }) => {
     }
   }, [currentIndex]);
 
-  const getItemLayout = (data: CarouselData[] | null | undefined, index: number) => ({
+  const getItemLayout = (data, index) => ({
     length: 140,
     offset: 140 * index,
     index,
   });
 
-  const onScrollToIndexFailed = (info: { index: number }) => {
+  const onScrollToIndexFailed = (info) => {
     const wait = new Promise((resolve) => setTimeout(resolve, 500));
     wait.then(() => {
       flatListRef.current?.scrollToIndex({ index: info.index, animated: true });
     });
   };
 
-  const handleNavigation = (page: string, params?: { mobileNumber?: string }) => {
+  const handleNavigation = (page, params) => {
     setActivePage(page);
     navigation.navigate(page, params); // Pass the params directly
-};
-
+  };
 
   return (
     <View style={styles.container}>
@@ -160,10 +131,8 @@ const AdminHomeScreen: React.FC<NextScreenProps> = ({navigation, route }) => {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            
             contentContainerStyle={styles.carouselList}
             pagingEnabled
-            
             onScrollToIndexFailed={onScrollToIndexFailed}
           />
           <View style={styles.carouselDotsContainer}>
@@ -191,7 +160,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     zIndex: 0,
-  
   },
   slogan: {
     textAlign: 'center',
@@ -248,7 +216,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
     maxWidth: 118, // Adjust based on card width
-  
   },
   card: {
     borderRadius: 10,
@@ -287,56 +254,38 @@ const styles = StyleSheet.create({
   cText: {
     fontSize: 15,
     fontFamily: 'CustomFont', // Use custom font here
-    
   },
   carouselList: {
     alignItems: 'center',
   },
   carouselItemOuterContainer: {
-    width: 180, // Width of the outer container
     marginHorizontal: 10,
   },
   carouselItem: {
-    justifyContent: 'center',
     alignItems: 'center',
-    height: 220, // Height of the outer container
+    justifyContent: 'center',
+    width: 200,
+    height: 140,
   },
   carouselImage: {
-    width: '100%', // Make image fill the outer container width
-    height: '100%', // Make image fill the outer container height
+    width: '100%',
+    height: 100,
     borderRadius: 10,
   },
   carouselItemText: {
-    marginTop: 10,
-    fontSize: 18, // Increase font size
+    marginTop: 5,
+    textAlign: 'center',
+    fontSize: 12,
     fontFamily: 'CustomFont', // Use custom font here
   },
   carouselDotsContainer: {
-    position: 'absolute',
-    bottom: 10,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF', // Change background to white
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    marginTop: 10,
     position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    zIndex: 10,
+    bottom: -10,
+    left: 0,
+    right: 0,
   },
 });
 

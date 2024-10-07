@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Card } from 'react-native-paper';
-import { RouteProp, useRoute } from '@react-navigation/native'; // Import useRoute and RouteProp
+import { useRoute } from '@react-navigation/native';
 
-const imageMap: { [key: string]: any } = {
+const { width, height } = Dimensions.get('window'); // Get device dimensions
+
+const imageMap = {
   'anumal_attack.png': require('../assets/image.png'),
   'reports.png': require('../assets/image.png'),
   'pawprint.png': require('../assets/elephant1.png'),
@@ -12,53 +14,25 @@ const imageMap: { [key: string]: any } = {
   'carousel1.png': require('../assets/guar_attack.png'),
   'carousel2.png': require('../assets/snake_attack.png'),
   'carousel3.png': require('../assets/deer_attack.png'),
-  
 };
 
-type CardData = {
-  id: string;
-  title: string;
-  subtitle: string;
-  image: keyof typeof imageMap;
-};
-
-type ImageCardData = {
-  id: string;
-  image: keyof typeof imageMap;
-};
-
-type NavigationProp = {
-  navigate: (screen: string) => void;
-};
-
-type RouteParams = {
-  mobileNumber?: string; // Define mobileNumber as optional
-};
-
-type PublicHomeScreenRouteProp = RouteProp<{ PublicHomeScreen: RouteParams }, 'PublicHomeScreen'>;
-
-type NextScreenProps = {
-  navigation: NavigationProp;
-  route: PublicHomeScreenRouteProp; // Add route prop
-};
-
-const PublicHomeScreen: React.FC<NextScreenProps> = ({ navigation, route }) => {
+const PublicHomeScreen = ({ navigation }) => {
   const [activePage, setActivePage] = useState('home'); // Track active page
-  const [mobileNumber, setMobileNumber] = useState<string | undefined>(route.params.mobileNumber);
+  const route = useRoute();
+  const mobileNumber = route.params?.mobileNumber; // Get mobile number from route params
 
-  const cardsData: CardData[] = [
+  const cardsData = [
     { id: '1', title: 'Report a Wildlife', subtitle: 'Subtitle 1', image: 'pawprint.png' },
     { id: '2', title: "Dos & Don'ts", subtitle: 'Subtitle 2', image: 'anumal_attack.png' },
   ];
 
-  const imageCardsData: ImageCardData[] = [
+  const imageCardsData = [
     { id: '1', image: 'carousel1.png' },
     { id: '2', image: 'carousel2.png' },
     { id: '3', image: 'carousel3.png' },
-    
   ];
 
-  const handleNavigation = (page: string) => {
+  const handleNavigation = (page) => {
     setActivePage(page);
     navigation.navigate(page, { mobileNumber });
   };
@@ -148,7 +122,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#FFFFFF',
     fontSize: 20,
-    marginTop: 40,
+    marginTop: height * 0.05, // 5% of screen height
     fontFamily: 'CustomFont', // Use custom font here
   },
   scrollViewContent: {
@@ -187,18 +161,17 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   cardOuterContainer: {
-    flex: 1,
     marginHorizontal: 10,
     backgroundColor: '#FFFFFF', // Set card background to white
     borderRadius: 10,
     overflow: 'hidden',
-    height: 120,
+    height: height * 0.15, // 15% of screen height
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    maxWidth: 118, // Adjust based on card width
+    maxWidth: width * 0.35, // 35% of screen width
   },
   card: {
     borderRadius: 10,
@@ -225,17 +198,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'CustomFont', // Use custom font here
   },
-  imageCardContainer: {
-    marginTop: 20,
-  },
   imageCardOuterContainer: {
-    flex: 1,
     marginHorizontal: 10,
     backgroundColor: '#FFFFFF', // Set card background to white
     borderRadius: 10,
     overflow: 'hidden',
-    height: 320,
-    width: 280,
+    height: height * 0.4, // 40% of screen height
+    width: width * 0.8, // 80% of screen width
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

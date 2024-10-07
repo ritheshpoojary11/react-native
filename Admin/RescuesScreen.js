@@ -1,18 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, FlatList, ScrollView, TouchableOpacity, Modal, Linking, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, FlatList, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { ref, onValue, update, database } from '../firebaseConfig';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types';
+import { ref, onValue } from '../firebaseConfig';
 
-type RescuesScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'RescuesScreen'>;
-
-interface RescuesScreenProps {
-  navigation: RescuesScreenNavigationProp;
-}
-
-// Skeleton loader component
 const SkeletonLoader = () => (
   <View style={styles.skeletonRow}>
     <View style={styles.skeletonCell} />
@@ -23,8 +14,8 @@ const SkeletonLoader = () => (
 );
 
 const CompletedTab = () => {
-  const [completedRescues, setCompletedRescues] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [completedRescues, setCompletedRescues] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const reportsRef = ref(database, 'reports');
@@ -44,7 +35,6 @@ const CompletedTab = () => {
     <View style={styles.container}>
       <ScrollView horizontal>
         <View>
-          {/* Table Header */}
           <View style={styles.tableHeader}>
             <Text style={[styles.headerText, styles.headerCell]}>Mobile Number</Text>
             <Text style={[styles.headerText, styles.headerCell]}>Reported Date</Text>
@@ -52,11 +42,8 @@ const CompletedTab = () => {
             <Text style={[styles.headerText, styles.headerCell]}>Assigned Rescuer</Text>
           </View>
 
-          {/* Table Rows */}
           {loading ? (
-            Array(4)
-              .fill(0)
-              .map((_, index) => <SkeletonLoader key={index} />)
+            Array(4).fill(0).map((_, index) => <SkeletonLoader key={index} />)
           ) : (
             <FlatList
               data={completedRescues}
@@ -78,8 +65,8 @@ const CompletedTab = () => {
 };
 
 const PendingTab = () => {
-  const [pendingRescues, setPendingRescues] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [pendingRescues, setPendingRescues] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const reportsRef = ref(database, 'reports');
@@ -99,18 +86,14 @@ const PendingTab = () => {
     <View style={styles.container}>
       <ScrollView horizontal>
         <View>
-          {/* Table Header */}
           <View style={styles.tableHeader}>
             <Text style={[styles.headerText, styles.headerCell]}>Mobile Number</Text>
             <Text style={[styles.headerText, styles.headerCell]}>Reported Date</Text>
             <Text style={[styles.headerText, styles.headerCell]}>Assigned Rescuer</Text>
           </View>
 
-          {/* Table Rows */}
           {loading ? (
-            Array(4)
-              .fill(0)
-              .map((_, index) => <SkeletonLoader key={index} />)
+            Array(4).fill(0).map((_, index) => <SkeletonLoader key={index} />)
           ) : (
             <FlatList
               data={pendingRescues}
@@ -131,8 +114,8 @@ const PendingTab = () => {
 };
 
 const UnassignedTab = () => {
-  const [unassignedRescues, setUnassignedRescues] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [unassignedRescues, setUnassignedRescues] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const reportsRef = ref(database, 'reports');
@@ -152,18 +135,14 @@ const UnassignedTab = () => {
     <View style={styles.container}>
       <ScrollView horizontal>
         <View>
-          {/* Table Header */}
           <View style={styles.tableHeader}>
             <Text style={[styles.headerText, styles.headerCell]}>Mobile Number</Text>
             <Text style={[styles.headerText, styles.headerCell]}>Reported Date</Text>
             <Text style={[styles.headerText, styles.headerCell]}>Location</Text>
           </View>
 
-          {/* Table Rows */}
           {loading ? (
-            Array(4)
-              .fill(0)
-              .map((_, index) => <SkeletonLoader key={index} />)
+            Array(4).fill(0).map((_, index) => <SkeletonLoader key={index} />)
           ) : (
             <FlatList
               data={unassignedRescues}
@@ -185,13 +164,13 @@ const UnassignedTab = () => {
   );
 };
 
-const RescuesScreen: React.FC<RescuesScreenProps> = ({ navigation }) => {
+const RescuesScreen = ({ navigation }) => {
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
+  const routes = [
     { key: 'completed', title: 'Completed' },
     { key: 'pending', title: 'Pending' },
     { key: 'unassigned', title: 'Unassigned' },
-  ]);
+  ];
 
   const renderScene = SceneMap({
     completed: CompletedTab,
@@ -287,20 +266,20 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   rowText: {
-    fontSize: 16,
-  },
-  cell: {
     flex: 1,
     textAlign: 'center',
+    fontSize: 14,
   },
   skeletonRow: {
     flexDirection: 'row',
     padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
   skeletonCell: {
     flex: 1,
     height: 20,
-    backgroundColor: '#eee',
+    backgroundColor: '#e0e0e0',
     marginHorizontal: 5,
   },
 });

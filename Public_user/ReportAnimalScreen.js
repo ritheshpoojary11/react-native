@@ -15,28 +15,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ficon from 'react-native-vector-icons/FontAwesome';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types';
 import CustomAlertMessage from './CustomAlertMessage';
 import { database, ref, set, serverTimestamp, onValue } from '../firebaseConfig';
-import { RouteProp } from '@react-navigation/native';
 
-type ReportAnimalScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'ReportAnimalScreen'
->;
-
-type ReportAnimalScreenRouteProp = RouteProp<
-  RootStackParamList,
-  'ReportAnimalScreen'
->;
-
-interface ReportAnimalScreenProps {
-  navigation: ReportAnimalScreenNavigationProp;
-  route: ReportAnimalScreenRouteProp; // Add route prop
-}
-
-const animalOptions: { label: string; value: string; image: any }[] = [
+const animalOptions = [
   { label: 'Leopard', value: 'leopard', image: require('../assets/leopard.png') },
   { label: 'Gaur', value: 'Gaur', image: require('../assets/gaur.png') },
   { label: 'Wildboar', value: 'Wildboar', image: require('../assets/wildboar.png') },
@@ -46,24 +28,22 @@ const animalOptions: { label: string; value: string; image: any }[] = [
   { label: 'Crocodile', value: 'Crocodile', image: require('../assets/Crocodiles.png') },
   { label: 'Dolphins', value: 'Dolphins', image: require('../assets/dolphins.png') },
   { label: 'Whales', value: 'Whales', image: require('../assets/whales.png') },
-  
 ];
 
-const ReportAnimalScreen: React.FC<ReportAnimalScreenProps> = ({ navigation, route }) => {
-  const [selectedAnimal, setSelectedAnimal] = useState<string | null>(null);
-  const [mobileNumber, setMobileNumber] = useState<string>(route.params.mobileNumber || ''); // Initialize with route parameter
-  const [loading, setLoading] = useState<boolean>(false);
-  const [activePage, setActivePage] = useState<string>('home');
-  const [alertVisible, setAlertVisible] = useState<boolean>(false);
-  const [alertTitle, setAlertTitle] = useState<string>('');
-  const [alertMessage, setAlertMessage] = useState<string>('');
-  const [location, setLocation] = useState<string>('');
+const ReportAnimalScreen = ({ navigation, route }) => {
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
+  const [mobileNumber, setMobileNumber] = useState(route.params.mobileNumber || '');
+  const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [location, setLocation] = useState('');
 
   useEffect(() => {
     requestNotificationPermission();
   }, []);
 
-  const requestNotificationPermission = async (): Promise<boolean> => {
+  const requestNotificationPermission = async () => {
     try {
       const { status } = await Notifications.getPermissionsAsync();
       if (status !== 'granted') {
@@ -81,11 +61,6 @@ const ReportAnimalScreen: React.FC<ReportAnimalScreenProps> = ({ navigation, rou
     }
   };
 
-  // const handleNavigation = (page: string) => {
-  //   setActivePage(page);
-  //   navigation.navigate(page);
-  // };
-
   const handleLocationAccess = async () => {
     setLoading(true);
     try {
@@ -96,13 +71,12 @@ const ReportAnimalScreen: React.FC<ReportAnimalScreenProps> = ({ navigation, rou
         setAlertVisible(true);
         return;
       }
-c
+
       let location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
-      console.log('aa');
+
       const locationMessage = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
-      console.log('aa',locationMessage);
       setAlertTitle('Location Accessed');
       setLocation(locationMessage);
       setAlertMessage(locationMessage);
@@ -113,7 +87,7 @@ c
       setAlertMessage('Failed to fetch location');
       setAlertVisible(true);
     } finally {
-      
+      setLoading(false);
     }
   };
 
@@ -135,15 +109,13 @@ c
       setLoading(false);
       return;
     }
-  
+
     await handleLocationAccess();
-  
-    // Get the current date and time
+
     const now = new Date();
-    const reportedDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
-    const reportedTime = now.toTimeString().split(' ')[0]; // HH:MM:SS format
-  
-    // Store data in Firebase Realtime Database
+    const reportedDate = now.toISOString().split('T')[0];
+    const reportedTime = now.toTimeString().split(' ')[0];
+
     try {
       const reportRef = ref(database, `reports/${Date.now()}`);
       await set(reportRef, {
@@ -152,14 +124,12 @@ c
         reportedDate,
         reportedTime,
         assignedRescuerMobileNumber: "",
-        adminMobileNumber:'9606611498',
+        adminMobileNumber: '9606611498',
         rescuedTime: "",
         location,
         timestamp: serverTimestamp(),
       });
-      console.log('Report submitted successfully');
-  
-      // Send email using backend API
+
       let emailResponse;
       try {
         emailResponse = await fetch('http://192.168.97.89:3000/send-email', {
@@ -172,53 +142,35 @@ c
             mobileNumber,
           }),
         });
-      } catch (error: unknown) {
-        if (error instanceof Error && error.message === 'Network request failed') {
-          console.error('Network error while sending email:', error);
-          setAlertTitle('Network Error');
-          setAlertMessage('There was a network problem. Please check your internet connection and try again.');
-          setAlertVisible(true);
-          setLoading(false);
-          return; // Exit early if there is a network error
-          
-        }
-      }
-  
-      // Handle email response
-      if (emailResponse && !emailResponse.ok) {
-        if (emailResponse.status === 500 || emailResponse.status === 503) {
-          console.log(`Error: Email service is under maintenance. HTTP Status Code: ${emailResponse.status}`);
-          setAlertTitle('Email Service Under Maintenance');
-          setAlertMessage('The email service is currently under maintenance. Please try again later.');
-        } else {
-          console.log(`Error: Failed to send email. HTTP Status Code: ${emailResponse.status}`);
-          setAlertTitle('Email Error');
-          setAlertMessage('There was a problem sending the email. Please try again later.');
-        
-        }
+      } catch (error) {
+        console.error('Network error while sending email:', error);
+        setAlertTitle('Network Error');
+        setAlertMessage('There was a network problem. Please check your internet connection and try again.');
         setAlertVisible(true);
         setLoading(false);
-        return; // Exit early if email fails
-        
+        return;
       }
-  
-      console.log('Email sent successfully');
-  
-      // Fetch admin's mobile number from Firebase
+
+      if (emailResponse && !emailResponse.ok) {
+        console.error(`Error: Failed to send email. HTTP Status Code: ${emailResponse.status}`);
+        setAlertTitle('Email Error');
+        setAlertMessage('There was a problem sending the email. Please try again later.');
+        setAlertVisible(true);
+        setLoading(false);
+        return;
+      }
+
       const adminRef = ref(database, 'admin');
       let adminMobileNumber = '';
-  
+
       onValue(adminRef, (snapshot) => {
         const adminData = snapshot.val();
         if (adminData) {
-          const adminKey = Object.keys(adminData)[0]; // Get the first key under 'admin'
-          adminMobileNumber = `+91${adminData[adminKey].mobileNumber}`; // Access mobileNumber under the specific key
+          const adminKey = Object.keys(adminData)[0];
+          adminMobileNumber = `+91${adminData[adminKey].mobileNumber}`;
         }
       });
-  
-      console.log(`Admin Mobile Number: ${adminMobileNumber}`);
-  
-      // Send SMS using backend API
+
       let smsResponse;
       try {
         smsResponse = await fetch('http://192.168.97.89:3000/send-sms', {
@@ -231,73 +183,42 @@ c
             message: `New report submitted for ${selectedAnimal}. Reporter Mobile: ${mobileNumber}. Location: ${location}`,
           }),
         });
-      } catch (error: unknown) {
-        if (error instanceof Error && error.message === 'Network request failed') {
-          console.error('Network error while sending SMS:', error);
-          setAlertTitle('Network Error');
-          setAlertMessage('There was a network problem while sending the SMS. Please check your connection and try again.');
-          setAlertVisible(true);
-          setLoading(false);
-          return; // Exit early if there is a network error
-          
-        }
-      }
-  
-      // Handle SMS response
-      if (smsResponse && !smsResponse.ok) {
-        if (smsResponse.status === 500  || smsResponse.status === 503) {
-          console.log(`Error: SMS service is under maintenance. HTTP Status Code: ${smsResponse.status}`);
-          setAlertTitle('SMS Service Under Maintenance');
-          setAlertMessage('The SMS service is currently under maintenance. Please try again later.');
-        } else {
-          console.log(`Error: Failed to send SMS. HTTP Status Code: ${smsResponse.status}`);
-          setAlertTitle('SMS Error');
-          setAlertMessage('There was a problem sending the SMS. Please try again later.');
-        }
-
+      } catch (error) {
+        console.error('Network error while sending SMS:', error);
+        setAlertTitle('Network Error');
+        setAlertMessage('There was a network problem while sending the SMS. Please check your connection and try again.');
         setAlertVisible(true);
         setLoading(false);
-        return; // Exit early if SMS fails
-       
+        return;
       }
-  
-      console.log('SMS sent successfully to admin');
-  
-      // Display success message after report submission
+
+      if (smsResponse && !smsResponse.ok) {
+        console.error(`Error: Failed to send SMS. HTTP Status Code: ${smsResponse.status}`);
+        setAlertTitle('SMS Error');
+        setAlertMessage('There was a problem sending the SMS. Please try again later.');
+        setAlertVisible(true);
+        setLoading(false);
+        return;
+      }
+
       setAlertTitle('Thank you');
       setAlertMessage('Thank you for reporting the wildlife. Our rescue team will get in touch with you shortly to provide assistance.');
       setAlertVisible(true);
       setLoading(false);
-      // Send a notification after submission
       await sendNotification();
-  
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Error submitting report:', error.message);
-      } else {
-        console.error('Error submitting report:', error);
-      }
+
+    } catch (error) {
+      console.error('Error submitting report:', error);
       setAlertTitle('Network Error');
       setAlertMessage('There was a problem submitting the report. Please check your network connection and try again.');
       setAlertVisible(true);
       setLoading(false);
     }
   };
-  
-  const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Radius of the Earth in km
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
-  };
-  
+
   const handleAlertConfirm = () => {
     setAlertVisible(false);
-    navigation.navigate('DosAndDontsScreen'); // Navigate to the 'Do\'s and Don\'ts' page
+    navigation.navigate('DosAndDontsScreen');
   };
 
   const openLocationInMaps = () => {
@@ -310,11 +231,11 @@ c
   };
 
   const handleBlur = () => {
-    Keyboard.dismiss(); // Hide the keyboard when input loses focus
+    Keyboard.dismiss();
   };
 
   const handleGoBack = () => {
-    navigation.goBack(); // Navigate back to the previous screen
+    navigation.goBack();
   };
 
   return (

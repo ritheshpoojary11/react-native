@@ -16,10 +16,10 @@ const SkeletonLoader = () => (
 
 const TaskToCompleteScreen = () => {
   const navigation = useNavigation();
-  const [pendingRescues, setPendingRescues] = useState<any[]>([]);
-  const [completedRescues, setCompletedRescues] = useState<any[]>([]);
+  const [pendingRescues, setPendingRescues] = useState([]);
+  const [completedRescues, setCompletedRescues] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedRescue, setSelectedRescue] = useState<any>(null);
+  const [selectedRescue, setSelectedRescue] = useState(null);
   const [commentOption, setCommentOption] = useState(''); // Dropdown value
   const [comments, setComments] = useState(''); // For "Any other issues" input
   const [activeTab, setActiveTab] = useState('Pending'); // Controls the active tab
@@ -45,7 +45,7 @@ const TaskToCompleteScreen = () => {
     });
   }, []);
 
-  const handleDonePress = (rescue: any) => {
+  const handleDonePress = (rescue) => {
     setSelectedRescue(rescue);
     setModalVisible(true);
   };
@@ -72,14 +72,15 @@ const TaskToCompleteScreen = () => {
     }
   };
 
-  const openLocationInMaps = (location: string) => {
+  const openLocationInMaps = (location) => {
     Linking.openURL(location);
   };
-  const makePhoneCall = (phoneNumber: string) => {
+
+  const makePhoneCall = (phoneNumber) => {
     Linking.openURL(`tel:${phoneNumber}`);
   };
 
-  const renderRescueItem = ({ item }: { item: any }) => (
+  const renderRescueItem = ({ item }) => (
     <View style={styles.card}>
       {/* Mobile Number with clickable icon */}
       <View style={styles.mobileContainer}>
@@ -100,7 +101,7 @@ const TaskToCompleteScreen = () => {
     </View>
   );
 
-  const renderCompletedRow = ({ item }: { item: any }) => (
+  const renderCompletedRow = ({ item }) => (
     <View style={styles.tableRow}>
       <Text style={styles.tableCell}>{item.id}</Text>
       <Text style={styles.tableCell}>{item.description}</Text>
@@ -238,86 +239,75 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
   },
   tabButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  mobileContainer: {
-    flexDirection: 'row',
+    padding: 10,
+    flex: 1,
     alignItems: 'center',
   },
-  phoneIcon: {
-    marginRight: 10,
-    paddingLeft: 10,
-  },
   activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#004D40',
+    backgroundColor: '#6200EE',
   },
   tabText: {
-    fontSize: 16,
+    color: 'black',
     fontWeight: 'bold',
-    color: '#004D40',
   },
   card: {
     backgroundColor: 'white',
-    borderRadius: 10,
+    borderRadius: 8,
     padding: 15,
-    marginVertical: 10,
-    marginHorizontal: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    margin: 10,
+    elevation: 2,
+  },
+  mobileContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  phoneIcon: {
+    marginLeft: 10,
   },
   cardText: {
     fontSize: 16,
-    marginBottom: 5,
+    marginVertical: 5,
   },
   openLocationText: {
     color: '#6200EE',
     textDecorationLine: 'underline',
   },
   doneButton: {
-    backgroundColor: '#004D40',
-    paddingVertical: 10,
-    marginTop: 10,
+    backgroundColor: '#6200EE',
     borderRadius: 5,
+    padding: 10,
     alignItems: 'center',
   },
   doneButtonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#004D40',
+    backgroundColor: '#6200EE',
     padding: 10,
   },
   tableHeaderText: {
     flex: 1,
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'center',
   },
   tableRow: {
     flexDirection: 'row',
     padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   tableCell: {
     flex: 1,
-    textAlign: 'center',
-    fontSize: 16,
   },
   modalView: {
     margin: 20,
     backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 45,
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -326,36 +316,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    marginTop: 300,
   },
   modalText: {
-    fontSize: 18,
     marginBottom: 15,
-    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  picker: {
+    height: 50,
+    width: 200,
+    marginBottom: 15,
   },
   input: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginTop: 10,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    marginBottom: 15,
+    width: '80%',
+    padding: 10,
   },
   submitButton: {
-    backgroundColor: '#004D40',
-    paddingVertical: 10,
+    backgroundColor: '#6200EE',
     borderRadius: 5,
+    padding: 10,
     alignItems: 'center',
   },
   submitButtonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
   },
   skeletonText: {
     width: '90%',
