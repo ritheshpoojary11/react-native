@@ -116,41 +116,44 @@ const ReportsScreen = () => {
         <Text style={styles.title}>Rescue Reports</Text>
         <View style={styles.headerButtons}>
           <TouchableOpacity style={styles.filterButton} onPress={() => setFilterVisible(true)}>
-            <MaterialIcons name="filter-list" size={24} color="#FFFFFF" />
+            <MaterialIcons name="filter-list" size={24} color="#004D40" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.filterButton} onPress={() => setDownloadHistoryVisible(true)}>
-            <MaterialIcons name="folder" size={24} color="#FFFFFF" />
+            <MaterialIcons name="folder" size={24} color="#004D40" />
           </TouchableOpacity>
         </View>
       </View>
 
-      <ScrollView horizontal={true}>
-        <View style={styles.tableContainer}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.headerText}>Location</Text>
-            <Text style={styles.headerText}>Mobile Number</Text>
-            <Text style={styles.headerText}>Reported Date</Text>
-            <Text style={styles.headerText}>Reported Time</Text>
-            <Text style={styles.headerText}>Selected Animal</Text>
-            <Text style={styles.headerText}>Assigned Rescuer</Text>
-            <Text style={styles.headerText}>Rescued Time</Text>
-          </View>
+      <ScrollView horizontal>
+  <View style={styles.tableContainer}>
+    {/* Table Header */}
+    <View style={styles.tableHeader}>
+      <Text style={styles.headerText}>Location</Text>
+      <Text style={styles.headerText}>Mobile Number</Text>
+      <Text style={styles.headerText}>Reported Date</Text>
+      <Text style={styles.headerText}>Reported Time</Text>
+      <Text style={styles.headerText}>Selected Animal</Text>
+      <Text style={styles.headerText}>Assigned Rescuer</Text>
+      <Text style={styles.headerText}>Rescued Time</Text>
+    </View>
 
-          {paginatedData.map(item => (
-            <View key={item.id} style={styles.tableRow}>
-              <TouchableOpacity onPress={() => Linking.openURL(item.location)}>
-                <Text style={[styles.rowText, { color: 'blue' }]}>Open Location</Text>
-              </TouchableOpacity>
-              <Text style={styles.rowText}>{item.mobileNumber}</Text>
-              <Text style={styles.rowText}>{item.reportedDate}</Text>
-              <Text style={styles.rowText}>{item.reportedTime}</Text>
-              <Text style={styles.rowText}>{item.selectedAnimal}</Text>
-              <Text style={styles.rowText}>{item.assignedRescuerMobileNumber || 'Unassigned'}</Text>
-              <Text style={styles.rowText}>{item.rescuedTime || 'Not yet rescued'}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
+    {/* Table Rows */}
+    {paginatedData.map((item) => (
+      <View key={item.id} style={styles.tableRow}>
+        <TouchableOpacity onPress={() => Linking.openURL(item.location)}>
+          <Text style={[styles.rowText, { color: 'blue' }]}>Open Location</Text>
+        </TouchableOpacity>
+        <Text style={styles.rowText}>{item.mobileNumber}</Text>
+        <Text style={styles.rowText}>{item.reportedDate}</Text>
+        <Text style={styles.rowText}>{item.reportedTime}</Text>
+        <Text style={styles.rowText}>{item.selectedAnimal}</Text>
+        <Text style={styles.rowText}>{item.assignedRescuerMobileNumber || 'Unassigned'}</Text>
+        <Text style={styles.rowText}>{item.rescuedTime || 'Not yet rescued'}</Text>
+      </View>
+    ))}
+  </View>
+</ScrollView>
+
 
       <View style={styles.paginationContainer}>
         <TouchableOpacity
@@ -273,11 +276,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#d9d9d9',
     padding: 10,
+    
   },
   headerText: {
     fontWeight: 'bold',
     flex: 1,
     textAlign: 'center',
+    paddingRight: 12,
   },
   tableRow: {
     flexDirection: 'row',

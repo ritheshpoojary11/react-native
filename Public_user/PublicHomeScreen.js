@@ -11,9 +11,9 @@ const imageMap = {
   'reports.png': require('../assets/image.png'),
   'pawprint.png': require('../assets/elephant1.png'),
   'quickaccess.png': require('../assets/access.png'),
-  'carousel1.png': require('../assets/guar_attack.png'),
-  'carousel2.png': require('../assets/snake_attack.png'),
-  'carousel3.png': require('../assets/deer_attack.png'),
+  'carousel1.png': require('../assets/1-removebg-preview.png'),
+  'carousel2.png': require('../assets/2-removebg-preview.png'),
+  'carousel3.png': require('../assets/3-removebg-preview.png'),
 };
 
 const PublicHomeScreen = ({ navigation }) => {
@@ -203,8 +203,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF', // Set card background to white
     borderRadius: 10,
     overflow: 'hidden',
-    height: height * 0.4, // 40% of screen height
-    width: width * 0.8, // 80% of screen width
+    height: height * 0.6, // 40% of screen height
+    width: width * 0.9, // 80% of screen width
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -215,6 +215,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     overflow: 'hidden',
     minWidth: 100,
+   
   },
   imageCardContent: {
     alignItems: 'center',

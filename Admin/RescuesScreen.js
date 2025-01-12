@@ -152,16 +152,20 @@ const UnassignedTab = () => {
   };
 
   const assignRescuer = (rescuerMobileNumber) => {
-    if (selectedReportId) {
-      const reportRef = ref(database, `reports/${selectedReportId}`);
-      update(reportRef, { assignedRescuerMobileNumber: rescuerMobileNumber })
-        .then(() => {
-          setModalVisible(false);
-          setSelectedReportId(null);
-        })
-        .catch((error) => console.error("Error updating report:", error));
-    }
+    if (!selectedReportId || !rescuerMobileNumber) return;
+    const reportRef = ref(database, `reports/${selectedReportId}`);
+    update(reportRef, { assignedRescuerMobileNumber: rescuerMobileNumber })
+      .then(() => {
+        alert(`Assigned rescuer with mobile: ${rescuerMobileNumber}`);
+        setModalVisible(false);
+        setSelectedReportId(null);
+      })
+      .catch((error) => {
+        alert("Failed to assign rescuer. Please try again.");
+        console.error("Error updating report:", error);
+      });
   };
+  
 
   return (
     <View style={styles.container}>
@@ -246,24 +250,31 @@ const RescuesScreen = ({ navigation }) => {
   });
 
   return (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      onIndexChange={setIndex}
-      initialLayout={{ width: 400 }}
-      renderTabBar={(props) => (
-        <TabBar
-          {...props}
-          indicatorStyle={{ backgroundColor: '#004D40' }}
-          style={{ backgroundColor: '#004D40' }}
-        />
-      )}
-    />
+    <View style={styles.screenContainer}>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width: 400 }}
+        renderTabBar={(props) => (
+          <TabBar
+            {...props}
+            indicatorStyle={{ backgroundColor: '#004D40' }}
+            style={{ backgroundColor: '#004D40' }}
+          />
+        )}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 10 },
+  screenContainer: { 
+    flex: 1, 
+    paddingTop: 50, // Add space at the top
+    backgroundColor: '#F5F5F5' // Optional: Set a background color to enhance visual separation
+  },
+  container: { flex: 1, paddingTop: 0 },
   tableHeader: { flexDirection: 'row', backgroundColor: '#004D40', padding: 10 },
   headerText: { color: '#fff', fontWeight: 'bold' },
   headerCell: { width: 120, textAlign: 'center' },
@@ -277,7 +288,7 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
   rescuerButton: { paddingVertical: 10, width: '100%', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#ccc' },
   rescuerText: { fontSize: 16, color: '#004D40' },
-  closeButton: { marginTop: 20, color: '#004D40', fontSize: 16 },
+  closeButton: { marginTop: 20, color: '#004D40', fontSize: 16},
   skeletonRow: { flexDirection: 'row', padding: 10 },
   skeletonCell: { width: 120, height: 20, backgroundColor: '#ccc', marginRight: 10, borderRadius: 5 },
 });

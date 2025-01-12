@@ -68,7 +68,7 @@ const RescuerHomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.backgroundContainer} />
 
-      <Text style={styles.slogan}>Saving Lives, One Paw at a Time</Text>
+      <Text style={styles.slogan}>Protecting Wildlife, Preserving Nature.</Text>
       
       <View style={styles.searchBar}>
         <Icon name="search" size={20} color="#999999" style={styles.searchIcon} />
@@ -105,7 +105,7 @@ const RescuerHomeScreen = ({ navigation }) => {
           contentContainerStyle={styles.cardList}
         />
 
-        <View style={styles.carouselContainer}>
+        {/* <View style={styles.carouselContainer}>
           <View style={styles.carouselTextContainer}>
             <Text style={styles.cText}>Our rescues....\..</Text>
           </View>
@@ -133,7 +133,7 @@ const RescuerHomeScreen = ({ navigation }) => {
           <View style={styles.carouselDotsContainer}>
             <Icon name="more-horiz" size={30} color="#FFFFFF" />
           </View>
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );

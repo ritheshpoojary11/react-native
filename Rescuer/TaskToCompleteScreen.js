@@ -103,8 +103,8 @@ const TaskToCompleteScreen = () => {
 
   const renderCompletedRow = ({ item }) => (
     <View style={styles.tableRow}>
-      <Text style={styles.tableCell}>{item.id}</Text>
-      <Text style={styles.tableCell}>{item.description}</Text>
+      <Text style={styles.tableCell}>{item.mobileNumber}</Text>
+      
       <Text style={styles.tableCell}>{item.rescuedTime}</Text>
       <Text style={styles.tableCell}>{item.rescuedDate}</Text>
     </View>
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeTab: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#004D40',
   },
   tabText: {
     color: 'black',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   doneButton: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#004D40',
     borderRadius: 5,
     padding: 10,
     alignItems: 'center',
@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: 'white',
     fontWeight: 'bold',
+    
   },
   tableRow: {
     flexDirection: 'row',
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   submitButton: {
-    backgroundColor: '#6200EE',
+    backgroundColor: '#004D40',
     borderRadius: 5,
     padding: 10,
     alignItems: 'center',

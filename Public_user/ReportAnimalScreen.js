@@ -19,15 +19,15 @@ import CustomAlertMessage from './CustomAlertMessage';
 import { database, ref, set, serverTimestamp, onValue } from '../firebaseConfig';
 
 const animalOptions = [
-  { label: 'Leopard', value: 'leopard', image: require('../assets/leopard.png') },
-  { label: 'Gaur', value: 'Gaur', image: require('../assets/gaur.png') },
-  { label: 'Wildboar', value: 'Wildboar', image: require('../assets/wildboar.png') },
-  { label: 'Snake', value: 'snake', image: require('../assets/snake.png') },
-  { label: 'Sea Bird', value: 'Sea Bird', image: require('../assets/Sea_Birds.png') },
-  { label: 'Sea Turtle', value: 'Sea Turtle', image: require('../assets/Turtles.png') },
-  { label: 'Crocodile', value: 'Crocodile', image: require('../assets/Crocodiles.png') },
-  { label: 'Dolphins', value: 'Dolphins', image: require('../assets/dolphins.png') },
-  { label: 'Whales', value: 'Whales', image: require('../assets/whales.png') },
+  { label: 'Leopard', value: 'leopard', image: require('../assets/leopard-lying-silhouette-vector-removebg-preview.png') },
+  { label: 'Gaur', value: 'Gaur', image: require('../assets/pngtree-the-head-of-a-bull-with-an-angry-glare-vector-png-image_15740597-removebg-preview.png') },
+  { label: 'Wildboar', value: 'Wildboar', image: require('../assets/wild-boar-silhouette-0274c1-removebg-preview.png') },
+  { label: 'Snake', value: 'snake', image: require('../assets/103051781-snake-silhouette-curled-up-in-the-ring-snake-logo-vector-illustration-black-and-white-removebg-preview.png') },
+  { label: 'Sea Bird', value: 'Sea Bird', image: require('../assets/depositphotos_6600115-stock-illustration-vector-silhouette-of-the-wild-removebg-preview.png') },
+  { label: 'Sea Turtle', value: 'Sea Turtle', image: require('../assets/Screenshot_2025-01-10_231406-removebg-preview.png') },
+  { label: 'Crocodile', value: 'Crocodile', image: require('../assets/pngtree-vector-of-crocodile-design-on-white-background-png-image_4954095-removebg-preview.png') },
+  { label: 'Dolphins', value: 'Dolphins', image: require('../assets/Dolphin-silhouette-white-belly-black-and-white-silhouette-dolphins-silhouette_367940_wh860-removebg-preview.png') },
+  { label: 'Whales', value: 'Whales', image: require('../assets/humpback-whale-silhouette-design-sea-mammal-animal-sign-and-symbol-vector-removebg-preview.png') },
 ];
 
 const ReportAnimalScreen = ({ navigation, route }) => {
@@ -62,42 +62,56 @@ const ReportAnimalScreen = ({ navigation, route }) => {
   };
 
   const handleLocationAccess = async () => {
-  setLoading(true);
-  try {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      setAlertTitle('Permission Denied');
-      setAlertMessage('Permission to access location was denied');
-      setAlertVisible(true);
-      return;
-    }
-
-    let location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
-
-    if (!location) {
+    setLoading(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setAlertTitle('Permission Denied');
+        setAlertMessage(
+          'Location permission was denied. Please enable it in settings to report an animal.'
+        );
+        setAlertVisible(true);
+        return null;
+      }
+  
+      const currentLocation = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+  
+      if (!currentLocation?.coords) {
+        setAlertTitle('Error');
+        setAlertMessage('Location data is incomplete. Please try again.');
+        setAlertVisible(true);
+        return null;
+      }
+  
+      const { latitude, longitude } = currentLocation.coords;
+      const locationMessage = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      setLocation(locationMessage);
+  
+      // Reverse geocoding
+      const geocode = await Location.reverseGeocodeAsync({ latitude, longitude });
+      const { city, region, street } = geocode[0] || {};
+      console.log('City:', city, 'Region:', region, 'Street:', street);
+  
+      return {
+        locationMessage,
+        city,
+        region,
+        street,
+      };
+    } catch (error) {
+      console.error('Error fetching location:', error);
       setAlertTitle('Error');
-      setAlertMessage('Unable to fetch location. Try again.');
+      setAlertMessage(error.message || 'Failed to fetch location');
       setAlertVisible(true);
-      return;
+      return null;
+    } finally {
+      setLoading(false);
     }
-
-    const locationMessage = `https://www.google.com/maps?q=${location.coords.latitude},${location.coords.longitude}`;
-    console.log(locationMessage);
-    setAlertTitle('Location Accessed');
-    setLocation(locationMessage);
-    setAlertMessage(locationMessage);
-    setAlertVisible(false);
-  } catch (error) {
-    console.error('Error fetching location:', error);
-    setAlertTitle('Error');
-    setAlertMessage(error.message || 'Failed to fetch location');
-    setAlertVisible(true);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+  
+  
 
 
   const sendNotification = async () => {
@@ -118,13 +132,16 @@ const ReportAnimalScreen = ({ navigation, route }) => {
       setLoading(false);
       return;
     }
-
-    await handleLocationAccess();
-
+  
+    const locationData = await handleLocationAccess();
+    if (!locationData) return;
+  
+    const { locationMessage, city, region, street } = locationData;
+  
     const now = new Date();
     const reportedDate = now.toISOString().split('T')[0];
     const reportedTime = now.toTimeString().split(' ')[0];
-
+  
     try {
       const reportRef = ref(database, `reports/${Date.now()}`);
       await set(reportRef, {
@@ -135,87 +152,19 @@ const ReportAnimalScreen = ({ navigation, route }) => {
         assignedRescuerMobileNumber: "",
         adminMobileNumber: '9606611498',
         rescuedTime: "",
-        location,
+        location: locationMessage,
+        city,
+        region,
+        street,
         timestamp: serverTimestamp(),
       });
-
-      let emailResponse;
-      try {
-        emailResponse = await fetch('http://192.168.97.89:3000/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            animal: selectedAnimal,
-            mobileNumber,
-          }),
-        });
-      } catch (error) {
-        console.error('Network error while sending email:', error);
-        setAlertTitle('Network Error');
-        setAlertMessage('There was a network problem. Please check your internet connection and try again.');
-        setAlertVisible(true);
-        setLoading(false);
-        return;
-      }
-
-      if (emailResponse && !emailResponse.ok) {
-        console.error(`Error: Failed to send email. HTTP Status Code: ${emailResponse.status}`);
-        setAlertTitle('Email Error');
-        setAlertMessage('There was a problem sending the email. Please try again later.');
-        setAlertVisible(true);
-        setLoading(false);
-        return;
-      }
-
-      const adminRef = ref(database, 'admin');
-      let adminMobileNumber = '';
-
-      onValue(adminRef, (snapshot) => {
-        const adminData = snapshot.val();
-        if (adminData) {
-          const adminKey = Object.keys(adminData)[0];
-          adminMobileNumber = `+91${adminData[adminKey].mobileNumber}`;
-        }
-      });
-
-      let smsResponse;
-      try {
-        smsResponse = await fetch('http://192.168.97.89:3000/send-sms', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            to: adminMobileNumber,
-            message: `New report submitted for ${selectedAnimal}. Reporter Mobile: ${mobileNumber}. Location: ${location}`,
-          }),
-        });
-      } catch (error) {
-        console.error('Network error while sending SMS:', error);
-        setAlertTitle('Network Error');
-        setAlertMessage('There was a network problem while sending the SMS. Please check your connection and try again.');
-        setAlertVisible(true);
-        setLoading(false);
-        return;
-      }
-
-      if (smsResponse && !smsResponse.ok) {
-        console.error(`Error: Failed to send SMS. HTTP Status Code: ${smsResponse.status}`);
-        setAlertTitle('SMS Error');
-        setAlertMessage('There was a problem sending the SMS. Please try again later.');
-        setAlertVisible(true);
-        setLoading(false);
-        return;
-      }
-
+  
       setAlertTitle('Thank you');
       setAlertMessage('Thank you for reporting the wildlife. Our rescue team will get in touch with you shortly to provide assistance.');
       setAlertVisible(true);
       setLoading(false);
       await sendNotification();
-
+  
     } catch (error) {
       console.error('Error submitting report:', error);
       setAlertTitle('Network Error');
@@ -224,7 +173,7 @@ const ReportAnimalScreen = ({ navigation, route }) => {
       setLoading(false);
     }
   };
-
+  
   const handleAlertConfirm = () => {
     setAlertVisible(false);
     navigation.navigate('DosAndDontsScreen');
@@ -271,7 +220,7 @@ const ReportAnimalScreen = ({ navigation, route }) => {
           />
         </View>
 
-        <Text style={styles.animalSelectionText}>Select an Animal:</Text>
+        <Text style={styles.animalSelectionText}>Select Wildlife:</Text>
         <View style={styles.animalOptionsContainer}>
   {animalOptions.map((option) => (
     <TouchableOpacity
