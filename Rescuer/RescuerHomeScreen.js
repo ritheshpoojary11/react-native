@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Image, ScrollView, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Card } from 'react-native-paper';
-
+import { useRoute } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 
 const imageMap = {
@@ -20,6 +20,8 @@ const RescuerHomeScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef(null);
   const [activePage, setActivePage] = useState('home'); // Track active page
+  const route = useRoute();
+  const mobileNumber = route.params?.mobileNumber;
 
   const cardsData = [
     { id: '3', title: 'Task to Complete', subtitle: 'Subtitle 3', image: 'image.png' },
@@ -61,7 +63,7 @@ const RescuerHomeScreen = ({ navigation }) => {
 
   const handleNavigation = (page) => {
     setActivePage(page);
-    navigation.navigate(page);
+    navigation.navigate(page, { mobileNumber });
   };
 
   return (

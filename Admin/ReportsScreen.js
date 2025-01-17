@@ -6,6 +6,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Picker } from '@react-native-picker/picker';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { database, ref, onValue } from '../firebaseConfig';
+import { useRoute } from '@react-navigation/native'; 
 
 const ReportsScreen = () => {
   const [data, setData] = useState([]);
@@ -16,7 +17,8 @@ const ReportsScreen = () => {
   const [selectedMonth, setSelectedMonth] = useState('All');
   const [downloadHistoryVisible, setDownloadHistoryVisible] = useState(false);
   const [downloadedFiles, setDownloadedFiles] = useState([]);
-
+  const route = useRoute();
+  const adminMobileNumber = route.params?.mobileNumber; // Get mobile number from route params
   // Fetch data from Firebase
   useEffect(() => {
     const dataRef = ref(database, 'reports'); // Adjust the path as needed

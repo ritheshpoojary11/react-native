@@ -271,7 +271,7 @@ const RescuesScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   screenContainer: { 
     flex: 1, 
-    paddingTop: 50, // Add space at the top
+    paddingTop: 10, // Add space at the top
     backgroundColor: '#F5F5F5' // Optional: Set a background color to enhance visual separation
   },
   container: { flex: 1, paddingTop: 0 },

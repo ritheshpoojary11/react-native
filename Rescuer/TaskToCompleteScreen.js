@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native'; // For back arrow navi
 import { database, ref, onValue, update } from '../firebaseConfig'; // Firebase config
 import { Ionicons } from '@expo/vector-icons'; // For back arrow icon
 import { Picker } from '@react-native-picker/picker'; // For dropdown
-
+import { useRoute } from '@react-navigation/native';
 const SkeletonLoader = () => (
   <View style={styles.card}>
     <View style={styles.skeletonText}></View>
@@ -24,26 +24,39 @@ const TaskToCompleteScreen = () => {
   const [comments, setComments] = useState(''); // For "Any other issues" input
   const [activeTab, setActiveTab] = useState('Pending'); // Controls the active tab
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const route = useRoute();
+  const mobileNumber = route.params?.mobileNumber;
+  console.log(mobileNumber);
 
   useEffect(() => {
-    const reportsRef = ref(database, 'reports');
-    onValue(reportsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const pending = Object.keys(data)
-          .filter((key) => !data[key].rescuedTime || !data[key].rescuedDate)
-          .map((key) => ({ id: key, ...data[key] }));
+  const reportsRef = ref(database, 'reports');
+  onValue(reportsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const pending = Object.keys(data)
+        .filter(
+          (key) =>
+            (!data[key].rescuedTime || !data[key].rescuedDate) &&
+            data[key].assignedRescuerMobileNumber === mobileNumber
+        )
+        .map((key) => ({ id: key, ...data[key] }));
 
-        const completed = Object.keys(data)
-          .filter((key) => data[key].rescuedTime && data[key].rescuedDate)
-          .map((key) => ({ id: key, ...data[key] }));
+      const completed = Object.keys(data)
+        .filter(
+          (key) =>
+            data[key].rescuedTime &&
+            data[key].rescuedDate &&
+            data[key].assignedRescuerMobileNumber === mobileNumber
+        )
+        .map((key) => ({ id: key, ...data[key] }));
 
-        setPendingRescues(pending);
-        setCompletedRescues(completed);
-        setIsLoading(false); // Set loading to false when data is loaded
-      }
-    });
-  }, []);
+      setPendingRescues(pending);
+      setCompletedRescues(completed);
+      setIsLoading(false); // Set loading to false when data is loaded
+    }
+  });
+}, [mobileNumber]); // Add mobileNumber as a dependency
+
 
   const handleDonePress = (rescue) => {
     setSelectedRescue(rescue);

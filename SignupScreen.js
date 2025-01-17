@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.05,
     textAlign: 'center',
     fontFamily: 'CustomFont',
-    paddingTop: height * 0.02,
+    paddingTop: height * 0.01,
   },
   inputContainer: {
     flexDirection: 'row',

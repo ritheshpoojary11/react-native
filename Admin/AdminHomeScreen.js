@@ -20,7 +20,8 @@ const AdminHomeScreen = ({ navigation }) => {
   const flatListRef = useRef(null);
   const [activePage, setActivePage] = useState('home'); // Track active page
   const route = useRoute();
-  const [mobileNumber, setMobileNumber] = useState(route.params?.mobileNumber);
+  const mobileNumber = route.params?.mobileNumber; // Get mobile number from route params
+ 
 
   const cardsData = [
     { id: '1', title: 'Add Rescuer', subtitle: 'Subtitle 1', image: 'pawprint.png' },
@@ -64,7 +65,7 @@ const AdminHomeScreen = ({ navigation }) => {
 
   const handleNavigation = (page, params) => {
     setActivePage(page);
-    navigation.navigate(page, params); // Pass the params directly
+    navigation.navigate(page, { mobileNumber });
   };
 
   return (
@@ -92,7 +93,7 @@ const AdminHomeScreen = ({ navigation }) => {
                   handleNavigation('ReportsScreen');
                 }
                 else if (item.title === 'Add Rescuer') {
-                    handleNavigation('AddRescuerScreen', { adminMobileNumber: mobileNumber });
+                    handleNavigation('AddRescuerScreen');
                   }
               }}>
               <Card style={styles.card}>

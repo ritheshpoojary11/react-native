@@ -10,9 +10,10 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
 import { database, ref, set, serverTimestamp } from '../firebaseConfig';
+import { useRoute } from '@react-navigation/native'; 
 
-const AddRescuerScreen = ({ navigation, route }) => {
-  const { adminMobileNumber } = route.params; // Extract admin mobile number
+const AddRescuerScreen = ({ navigation }) => {
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -22,7 +23,9 @@ const AddRescuerScreen = ({ navigation, route }) => {
   const [latitude, setLatitude] = useState(null); // Latitude
   const [longitude, setLongitude] = useState(null); // Longitude
   const [loading, setLoading] = useState(false);
-
+  const route = useRoute();
+  const adminMobileNumber = route.params?.mobileNumber; // Get mobile number from route params
+ 
   if (!adminMobileNumber) {
     Alert.alert('Error', 'Admin mobile number is undefined.');
     return;
@@ -237,13 +240,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 40, // Adjust the top value to fit your design
+    top: 10, // Adjust the top value to fit your design
     left: 10, // Adjust the left value to fit your design
     zIndex: 1,
   },
   headerContainer: {
     backgroundColor: '#004D40',
-    paddingVertical: 39,
+    paddingVertical: 10,
     paddingHorizontal: 54,
   },
   headerText: {

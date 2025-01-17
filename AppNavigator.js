@@ -26,7 +26,6 @@ const CustomHeader = ({ navigation, options }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const slideAnim = useState(new Animated.Value(-200))[0];
   const slideRightAnim = useState(new Animated.Value(200))[0];
-
   const toggleMenu = () => {
     if (menuVisible) {
       Animated.timing(slideAnim, {
@@ -101,8 +100,8 @@ const CustomHeader = ({ navigation, options }) => {
       )}
 
       <Animated.View style={[styles.menuContainer, { transform: [{ translateX: slideAnim }] }]}>
-        <Text style={styles.menuItem} onPress={() => handleMenuItemPress()}>Home</Text>
-        <Text style={styles.menuItem} onPress={() => handleMenuItemPress()}>Report a Wildlife</Text>
+        <Text style={styles.menuItem} onPress={() => handleMenuItemPress()}></Text>
+        <Text style={styles.menuItem} onPress={() => handleMenuItemPress()}></Text>
       </Animated.View>
 
       {modalVisible && (
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 50,
+    paddingTop: 10,
     backgroundColor: '#004D40',
     paddingBottom: 10,
   },

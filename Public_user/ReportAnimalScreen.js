@@ -11,23 +11,37 @@ import {
   Linking,
   Keyboard,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // Import the Picker component
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ficon from 'react-native-vector-icons/FontAwesome';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import CustomAlertMessage from './CustomAlertMessage';
-import { database, ref, set, serverTimestamp, onValue } from '../firebaseConfig';
+import { database, ref, set, serverTimestamp } from '../firebaseConfig';
+import { ScrollView } from 'react-native';
 
 const animalOptions = [
   { label: 'Leopard', value: 'leopard', image: require('../assets/leopard-lying-silhouette-vector-removebg-preview.png') },
   { label: 'Gaur', value: 'Gaur', image: require('../assets/pngtree-the-head-of-a-bull-with-an-angry-glare-vector-png-image_15740597-removebg-preview.png') },
   { label: 'Wildboar', value: 'Wildboar', image: require('../assets/wild-boar-silhouette-0274c1-removebg-preview.png') },
   { label: 'Snake', value: 'snake', image: require('../assets/103051781-snake-silhouette-curled-up-in-the-ring-snake-logo-vector-illustration-black-and-white-removebg-preview.png') },
-  { label: 'Sea Bird', value: 'Sea Bird', image: require('../assets/depositphotos_6600115-stock-illustration-vector-silhouette-of-the-wild-removebg-preview.png') },
+  { label: 'Bird', value: 'Bird', image: require('../assets/depositphotos_6600115-stock-illustration-vector-silhouette-of-the-wild-removebg-preview.png') },
   { label: 'Sea Turtle', value: 'Sea Turtle', image: require('../assets/Screenshot_2025-01-10_231406-removebg-preview.png') },
-  { label: 'Crocodile', value: 'Crocodile', image: require('../assets/pngtree-vector-of-crocodile-design-on-white-background-png-image_4954095-removebg-preview.png') },
-  { label: 'Dolphins', value: 'Dolphins', image: require('../assets/Dolphin-silhouette-white-belly-black-and-white-silhouette-dolphins-silhouette_367940_wh860-removebg-preview.png') },
-  { label: 'Whales', value: 'Whales', image: require('../assets/humpback-whale-silhouette-design-sea-mammal-animal-sign-and-symbol-vector-removebg-preview.png') },
+  { label: 'Lizards', value: 'Lizards', image: require('../assets/pngtree-vector-of-crocodile-design-on-white-background-png-image_4954095-removebg-preview.png') },
+  { label: 'Monkey', value: 'Monkey', image: require('../assets/silhouette-monkey-animal-genus-primates-vector-illustrator-163854286-Photoroom.png') },
+  { label: 'Marine mammals', value: 'Marine mammals', image: require('../assets/humpback-whale-silhouette-design-sea-mammal-animal-sign-and-symbol-vector-removebg-preview.png') },
+];
+
+const animalLocations = [
+  { label: 'Within Building', value: 'Within Building' },
+  { label: 'Settlement', value: 'Settlement' },
+  { label: 'Premises', value: 'Premises' },
+];
+
+const animalStates = [
+  { label: 'Injured', value: 'Injured' },
+  { label: 'Inactive', value: 'Inactive' },
+  { label: 'Trapped', value: 'Trapped' },
 ];
 
 const ReportAnimalScreen = ({ navigation, route }) => {
@@ -38,6 +52,9 @@ const ReportAnimalScreen = ({ navigation, route }) => {
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [location, setLocation] = useState('');
+  const [animalLocation, setAnimalLocation] = useState(''); // Updated to use dropdown
+  const [animalState, setAnimalState] = useState(''); // Updated to use dropdown
+
 
   useEffect(() => {
     requestNotificationPermission();
@@ -84,7 +101,7 @@ const ReportAnimalScreen = ({ navigation, route }) => {
         setAlertVisible(true);
         return null;
       }
-  
+
       const { latitude, longitude } = currentLocation.coords;
       const locationMessage = `https://www.google.com/maps?q=${latitude},${longitude}`;
       setLocation(locationMessage);
@@ -110,9 +127,6 @@ const ReportAnimalScreen = ({ navigation, route }) => {
       setLoading(false);
     }
   };
-  
-  
-
 
   const sendNotification = async () => {
     await Notifications.scheduleNotificationAsync({
@@ -125,28 +139,30 @@ const ReportAnimalScreen = ({ navigation, route }) => {
   };
 
   const handleSubmit = async () => {
-    if (!mobileNumber || !selectedAnimal) {
+    if (!mobileNumber || !selectedAnimal || !animalLocation || !animalState) {
       setAlertTitle('Incomplete Information');
-      setAlertMessage('Please provide both the mobile number and select an animal.');
+      setAlertMessage('Please provide all the required details to submit the report.');
       setAlertVisible(true);
       setLoading(false);
       return;
     }
-  
+
     const locationData = await handleLocationAccess();
     if (!locationData) return;
-  
+
     const { locationMessage, city, region, street } = locationData;
-  
+
     const now = new Date();
     const reportedDate = now.toISOString().split('T')[0];
     const reportedTime = now.toTimeString().split(' ')[0];
-  
+
     try {
       const reportRef = ref(database, `reports/${Date.now()}`);
       await set(reportRef, {
         mobileNumber,
         selectedAnimal,
+        animalLocation, // Include animal location
+        animalState, // Include animal state
         reportedDate,
         reportedTime,
         assignedRescuerMobileNumber: "",
@@ -158,13 +174,12 @@ const ReportAnimalScreen = ({ navigation, route }) => {
         street,
         timestamp: serverTimestamp(),
       });
-  
+
       setAlertTitle('Thank you');
       setAlertMessage('Thank you for reporting the wildlife. Our rescue team will get in touch with you shortly to provide assistance.');
       setAlertVisible(true);
       setLoading(false);
       await sendNotification();
-  
     } catch (error) {
       console.error('Error submitting report:', error);
       setAlertTitle('Network Error');
@@ -173,7 +188,7 @@ const ReportAnimalScreen = ({ navigation, route }) => {
       setLoading(false);
     }
   };
-  
+
   const handleAlertConfirm = () => {
     setAlertVisible(false);
     navigation.navigate('DosAndDontsScreen');
@@ -206,7 +221,8 @@ const ReportAnimalScreen = ({ navigation, route }) => {
       </View>
 
       <View style={styles.backgroundContainer} />
-
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        
       <View style={styles.formContainer}>
         <View style={styles.inputContainer}>
           <Ficon name="phone" size={20} color="#004d40" style={styles.icon} />
@@ -222,20 +238,48 @@ const ReportAnimalScreen = ({ navigation, route }) => {
 
         <Text style={styles.animalSelectionText}>Select Wildlife:</Text>
         <View style={styles.animalOptionsContainer}>
-  {animalOptions.map((option) => (
-    <TouchableOpacity
-      key={option.value}
-      onPress={() => setSelectedAnimal(option.value)}
-      style={[
-        styles.animalOption,
-        selectedAnimal === option.value && styles.selectedAnimalOption,
-      ]}
-    >
-      <Image source={option.image} style={styles.animalImage} />
-      <Text style={styles.animalLabel}>{option.label}</Text>
-    </TouchableOpacity>
-  ))}
-</View>
+          {animalOptions.map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              onPress={() => setSelectedAnimal(option.value)}
+              style={[
+                styles.animalOption,
+                selectedAnimal === option.value && styles.selectedAnimalOption,
+              ]}
+            >
+              <Image source={option.image} style={styles.animalImage} />
+              <Text style={styles.animalLabel}>{option.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Text style={styles.fieldLabel}>Animal Location:</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={animalLocation}
+              onValueChange={(value) => setAnimalLocation(value)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select Location" value="" />
+              {animalLocations.map((location) => (
+                <Picker.Item key={location.value} label={location.label} value={location.value} />
+              ))}
+            </Picker>
+          </View>
+
+          <Text style={styles.fieldLabel}>Animal State:</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={animalState}
+              onValueChange={(value) => setAnimalState(value)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select State" value="" />
+              {animalStates.map((state) => (
+                <Picker.Item key={state.value} label={state.label} value={state.value} />
+              ))}
+            </Picker>
+          </View>
 
         {loading ? (
           <ActivityIndicator size="large" color="#004d40" />
@@ -245,13 +289,12 @@ const ReportAnimalScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         )}
       </View>
-
+      </ScrollView>
       <CustomAlertMessage
         visible={alertVisible}
         title={alertTitle}
         message={alertMessage}
         onConfirm={handleAlertConfirm}
-        
       />
     </View>
   );
@@ -283,14 +326,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    top: 120,
+    top: 100,
     bottom: 0,
     left: 0,
     right: 0,
   },
+  scrollContent: {
+    paddingHorizontal: 0,
+    paddingBottom: 30, // Add padding for better scrolling experience
+    backgroundColor: '',
+  },
   formContainer: {
     flex: 1,
-    paddingTop: 30,
+    paddingTop: 10,
     paddingHorizontal: 20,
     marginTop: 20,
   },
@@ -316,11 +364,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-
   animalOptionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around', // Adjust spacing for the last row
+    justifyContent: 'space-around',
   },
   animalOption: {
     alignItems: 'center',
@@ -329,19 +376,43 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
     borderRadius: 10,
     marginBottom: 10,
-    width: '30%', // Change width to fit 3 columns
-    minWidth: 100, // Optional: Set a minimum width to ensure buttons aren't too small
+    width: '30%',
+    minWidth: 100,
   },
   selectedAnimalOption: {
     borderColor: '#004d40',
   },
   animalImage: {
-    width: 70,  // Increased size for zoom effect
-    height: 70, // Increased size for zoom effect
+    width: 70,
+    height: 70,
     marginBottom: 5,
   },
   animalLabel: {
     fontSize: 16,
+  },
+  fieldLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  inputField: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    fontSize: 16,
+    marginBottom: 15,
+  },
+  pickerContainer: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+    color: '#004d40',
   },
   submitButton: {
     backgroundColor: '#004d40',
